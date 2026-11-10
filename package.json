@@ -1,0 +1,10 @@
+{
+  "name": "accessibility-agent-skills",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test",
+    "validate-skills": "node bin/validate-skills.js"
+  }
+}
