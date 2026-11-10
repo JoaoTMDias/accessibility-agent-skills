@@ -12,12 +12,12 @@ Este contrato define o núcleo portátil de um skill de acessibilidade. Aplica-s
 
 O `SKILL.md` começa com frontmatter YAML delimitado por `---` e inclui:
 
-- `name`: 1 a 64 caracteres; apenas minúsculas, algarismos e hífen; não começa nem termina por hífen e não contém hífen duplo.
+- `name`: texto que coincide exactamente com o nome do directório.
 - `description`: texto não vazio que descreve o objectivo do skill.
 
 ## Secções obrigatórias
 
-O corpo Markdown inclui, com estes títulos exactos de nível 2:
+O corpo Markdown começa, com estes títulos exactos de nível 2 e por esta ordem, pelas sete secções seguintes:
 
 1. `Purpose and boundaries`
 2. `Required inputs`
@@ -27,8 +27,8 @@ O corpo Markdown inclui, com estes títulos exactos de nível 2:
 6. `Limitations and uncertainty`
 7. `Quality criteria`
 
-Secções adicionais são permitidas quando não alteram o significado destas regras.
+Secções adicionais são permitidas apenas depois destas sete, desde que não alterem o significado destas regras.
 
 ## Validação local
 
-`npm run validate-skills` valida todos os núcleos directamente em `skills/`. Para validar outro directório com a mesma estrutura, execute `npm run validate-skills -- <directório>`. O comando termina com código diferente de zero e indica o ficheiro e a regra violada quando encontra erros.
+`npm run validate-skills` valida todos os núcleos directamente em `skills/`. Para validar outro directório com a mesma estrutura, execute `npm run validate-skills -- <directório>`. O comando termina com código diferente de zero e indica o ficheiro ou directório e a regra violada quando encontra erros.

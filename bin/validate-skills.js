@@ -2,6 +2,7 @@
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join, relative } from "node:path";
+import YAML from "yaml";
 
 const requiredSections = [
   "Purpose and boundaries",
@@ -14,16 +15,27 @@ const requiredSections = [
 ];
 
 function parseFrontmatter(contents) {
-  const match = contents.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
-  if (!match) return { error: "o frontmatter YAML inicial é obrigatório" };
+  const lines = contents.split(/\r?\n/);
+  if (lines[0] !== "---") return { error: "o frontmatter YAML inicial é obrigatório" };
 
-  const fields = new Map();
-  for (const line of match[1].split(/\r?\n/)) {
-    const field = line.match(/^([A-Za-z][A-Za-z0-9-]*):\s*(.*?)\s*$/);
-    if (field) fields.set(field[1], field[2].replace(/^(["'])(.*)\1$/, "$2"));
+  const closingDelimiter = lines.indexOf("---", 1);
+  if (closingDelimiter === -1) return { error: "o frontmatter YAML inicial é obrigatório" };
+
+  const document = YAML.parseDocument(lines.slice(1, closingDelimiter).join("\n"), {
+    uniqueKeys: true,
+  });
+  if (document.errors.length > 0) {
+    return { error: `frontmatter YAML inválido: ${document.errors[0].message}` };
   }
 
-  return { fields, body: contents.slice(match[0].length) };
+  if (!YAML.isMap(document.contents)) {
+    return { error: "o frontmatter YAML deve ser um mapa de metadados" };
+  }
+
+  return {
+    fields: new Map(document.contents.items.map((item) => [item.key?.value, item.value?.value])),
+    body: lines.slice(closingDelimiter + 1).join("\n"),
+  };
 }
 
 function validateSkill(skillFile) {
@@ -36,38 +48,45 @@ function validateSkill(skillFile) {
   const description = fields.get("description");
   if (!name) errors.push("o metadado obrigatório 'name' está em falta");
   if (!description) errors.push("o metadado obrigatório 'description' está em falta");
-  if (name && !/^(?=.{1,64}$)[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) {
-    errors.push("o metadado 'name' deve ter 1–64 caracteres minúsculos, algarismos ou hífen");
-  }
   if (name && name !== basename(join(skillFile, ".."))) {
     errors.push(`o metadado 'name' ('${name}') não coincide com o directório ('${basename(join(skillFile, ".."))}')`);
   }
 
-  const headings = new Set([...body.matchAll(/^##\s+(.+?)\s*$/gm)].map((match) => match[1]));
-  for (const section of requiredSections) {
-    if (!headings.has(section)) errors.push(`a secção obrigatória '${section}' está em falta`);
+  const headings = [...body.matchAll(/^##\s+(.+?)\s*$/gm)].map((match) => match[1]);
+  for (const [index, section] of requiredSections.entries()) {
+    const heading = headings[index];
+    if (heading === section) continue;
+    if (heading === undefined) {
+      errors.push(`a secção obrigatória '${section}' está em falta`);
+    } else {
+      errors.push(`esperada a secção obrigatória '${section}' antes de '${heading}'`);
+    }
+    break;
   }
   return errors;
 }
 
-function findSkillFiles(root) {
+function findSkillDirectories(root) {
   if (!existsSync(root)) return [];
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .map((entry) => join(root, entry.name, "SKILL.md"))
-    .filter((file) => existsSync(file) && statSync(file).isFile());
+    .map((entry) => join(root, entry.name));
 }
 
 const root = process.argv[2] ?? "skills";
-const skillFiles = findSkillFiles(root);
-const failures = skillFiles.flatMap((skillFile) =>
-  validateSkill(skillFile).map((error) => `${relative(process.cwd(), skillFile)}: ${error}`),
-);
+const skillDirectories = findSkillDirectories(root);
+const failures = skillDirectories.flatMap((skillDirectory) => {
+  const skillFile = join(skillDirectory, "SKILL.md");
+  if (!existsSync(skillFile) || !statSync(skillFile).isFile()) {
+    return [`${relative(process.cwd(), skillDirectory)}: falta o ficheiro SKILL.md`];
+  }
+  return validateSkill(skillFile).map((error) => `${relative(process.cwd(), skillFile)}: ${error}`);
+});
 
 if (failures.length > 0) {
   console.error(`validate-skills: ${failures.length} erro(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`validate-skills: ${skillFiles.length} núcleo portátil válido(s).`);
+  console.log(`validate-skills: ${skillDirectories.length} núcleo portátil válido(s).`);
 }
