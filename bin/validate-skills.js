@@ -38,7 +38,7 @@ function parseFrontmatter(contents) {
   };
 }
 
-function validateSkill(skillFile) {
+function validateSkill(skillFile, requiresChecklist) {
   const errors = [];
   const parsed = parseFrontmatter(readFileSync(skillFile, "utf8"));
   if (parsed.error) return [parsed.error];
@@ -65,7 +65,23 @@ function validateSkill(skillFile) {
   }
 
   validateSources(body, skillFile, errors);
+  if (requiresChecklist) validateChecklist(skillFile, errors);
   return errors;
+}
+
+function validateChecklist(skillFile, errors) {
+  const checklist = join(skillFile, "..", "CHECKLIST.md");
+  if (!existsSync(checklist) || !statSync(checklist).isFile()) {
+    errors.push("falta o ficheiro CHECKLIST.md");
+    return;
+  }
+  const contents = readFileSync(checklist, "utf8").toLowerCase();
+  for (const item of ["activação", "entrada em falta", "caso negativo", "resultado esperado"]) {
+    const section = new RegExp(`^## ${item}\\s*\\n\\s*\\S`, "m");
+    if (!section.test(contents)) {
+      errors.push(`CHECKLIST.md tem de incluir '${item}'`);
+    }
+  }
 }
 
 function validateSources(body, skillFile, errors) {
@@ -176,15 +192,33 @@ function findSkillDirectories(root) {
     .map((entry) => join(root, entry.name));
 }
 
+function findOverlayDirectories(root) {
+  if (!existsSync(root)) return [];
+  return readdirSync(root, { withFileTypes: true })
+    .filter((environment) => environment.isDirectory())
+    .flatMap((environment) => findSkillDirectories(join(root, environment.name)));
+}
+
 const root = process.argv[2] ?? "skills";
 const skillDirectories = findSkillDirectories(root);
+const requiresChecklist = !relative(process.cwd(), resolve(root)).split(sep).includes("examples");
 const failures = skillDirectories.flatMap((skillDirectory) => {
   const skillFile = join(skillDirectory, "SKILL.md");
   if (!existsSync(skillFile) || !statSync(skillFile).isFile()) {
     return [`${relative(process.cwd(), skillDirectory)}: falta o ficheiro SKILL.md`];
   }
-  return validateSkill(skillFile).map((error) => `${relative(process.cwd(), skillFile)}: ${error}`);
+  return validateSkill(skillFile, requiresChecklist).map((error) => `${relative(process.cwd(), skillFile)}: ${error}`);
 });
+
+const overlaysRoot = join(root, "..", "overlays");
+for (const overlayDirectory of findOverlayDirectories(overlaysRoot)) {
+  const readme = join(overlayDirectory, "README.md");
+  if (!existsSync(readme) || !statSync(readme).isFile()) {
+    failures.push(`${relative(process.cwd(), overlayDirectory)}: falta o ficheiro README.md`);
+  } else if (!/^# (Activação|Instalação)\s*\n\s*\S/m.test(readFileSync(readme, "utf8"))) {
+    failures.push(`${relative(process.cwd(), readme)}: README.md tem de conter instruções manuais de activação ou instalação`);
+  }
+}
 
 if (failures.length > 0) {
   console.error(`validate-skills: ${failures.length} erro(s):`);

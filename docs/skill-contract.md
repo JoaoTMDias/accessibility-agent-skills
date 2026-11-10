@@ -35,6 +35,12 @@ Em `Sources`, cada fonte externa declarada usa uma entrada Markdown no formato `
 
 O validador confirma apenas esta estrutura e a existência de referências locais. Não abre URLs nem determina se uma fonte é primária, relevante ou suficiente; essa avaliação pertence à revisão humana.
 
+## Checklist e overlays
+
+Cada skill real inclui um `CHECKLIST.md` manual com quatro secções de nível 2, cada uma com conteúdo: `Activação`, `Entrada em falta`, `Caso negativo` e `Resultado esperado`. Os exemplos em `examples/` não exigem checklist.
+
+Os overlays são opcionais e vivem em `overlays/<ambiente>/<nome>/`. Cada overlay existente inclui um `README.md` com uma secção de nível 1 `Activação` ou `Instalação` e instruções manuais. A validação confirma a estrutura, não executa essas instruções.
+
 ## Validação local
 
 `npm run validate-skills` valida todos os núcleos directamente em `skills/`. Para validar outro directório com a mesma estrutura, execute `npm run validate-skills -- <directório>`. O comando termina com código diferente de zero e indica o ficheiro ou directório e a regra violada quando encontra erros.
