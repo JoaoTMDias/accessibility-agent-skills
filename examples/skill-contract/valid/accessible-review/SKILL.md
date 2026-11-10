@@ -17,7 +17,7 @@ Devolve achados com evidência.
 
 ## Sources
 
-Usa as fontes indicadas pelo pedido.
+Não se aplica: este exemplo valida apenas a estrutura base do contrato.
 
 ## Optional tools
 
