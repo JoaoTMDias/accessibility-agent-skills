@@ -13,8 +13,10 @@ const requiredSections = [
   "Limitations and uncertainty",
   "Quality criteria",
 ];
+type ValidationErrors = string[];
+type Frontmatter = { error: string } | { fields: Map<string, unknown>; body: string };
 
-function parseFrontmatter(contents) {
+function parseFrontmatter(contents: string): Frontmatter {
   const lines = contents.split(/\r?\n/);
   if (lines[0] !== "---") return { error: "o frontmatter YAML inicial é obrigatório" };
 
@@ -32,16 +34,20 @@ function parseFrontmatter(contents) {
     return { error: "o frontmatter YAML deve ser um mapa de metadados" };
   }
 
+  const fields = new Map<string, unknown>();
+  for (const item of document.contents.items as Array<{ key?: { value?: unknown }; value?: { value?: unknown } }>) {
+    if (typeof item.key?.value === "string") fields.set(item.key.value, item.value?.value);
+  }
   return {
-    fields: new Map(document.contents.items.map((item) => [item.key?.value, item.value?.value])),
+    fields,
     body: lines.slice(closingDelimiter + 1).join("\n"),
   };
 }
 
-function validateSkill(skillFile, requiresChecklist) {
-  const errors = [];
+function validateSkill(skillFile: string, requiresChecklist: boolean): ValidationErrors {
+  const errors: ValidationErrors = [];
   const parsed = parseFrontmatter(readFileSync(skillFile, "utf8"));
-  if (parsed.error) return [parsed.error];
+  if ("error" in parsed) return [parsed.error];
 
   const { fields, body } = parsed;
   const name = fields.get("name");
@@ -69,7 +75,7 @@ function validateSkill(skillFile, requiresChecklist) {
   return errors;
 }
 
-function validateChecklist(skillFile, errors) {
+function validateChecklist(skillFile: string, errors: ValidationErrors): void {
   const checklist = join(skillFile, "..", "CHECKLIST.md");
   if (!existsSync(checklist) || !statSync(checklist).isFile()) {
     errors.push("falta o ficheiro CHECKLIST.md");
@@ -84,7 +90,7 @@ function validateChecklist(skillFile, errors) {
   }
 }
 
-function validateSources(body, skillFile, errors) {
+function validateSources(body: string, skillFile: string, errors: ValidationErrors): void {
   const sources = body.match(/^## Sources\s*\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? "";
   const skillDirectory = join(skillFile, "..");
   let hasSourceOrReason = false;
@@ -123,8 +129,8 @@ function validateSources(body, skillFile, errors) {
   }
 }
 
-function validateExternalSource(url, details, errors) {
-  let parsedUrl;
+function validateExternalSource(url: string, details: string | undefined, errors: ValidationErrors): void {
+  let parsedUrl: URL | undefined;
   try {
     parsedUrl = new URL(url);
   } catch {
@@ -153,11 +159,11 @@ function validateExternalSource(url, details, errors) {
   }
 }
 
-function isVersionOrDate(value) {
+function isVersionOrDate(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) || /^\d+(?:\.\d+)+$/.test(value);
 }
 
-function validateInternalReference(reference, skillDirectory, errors) {
+function validateInternalReference(reference: string, skillDirectory: string, errors: ValidationErrors): void {
   const path = reference.split(/[?#]/, 1)[0];
   if (!path) {
     errors.push(`a referência interna '${reference}' tem de apontar para um ficheiro relativo`);
@@ -180,19 +186,19 @@ function validateInternalReference(reference, skillDirectory, errors) {
   }
 }
 
-function isOutsideDirectory(path, directory) {
+function isOutsideDirectory(path: string, directory: string): boolean {
   const pathFromDirectory = relative(directory, path);
   return pathFromDirectory === ".." || pathFromDirectory.startsWith(`..${sep}`) || isAbsolute(pathFromDirectory);
 }
 
-function findSkillDirectories(root) {
+function findSkillDirectories(root: string): string[] {
   if (!existsSync(root)) return [];
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => join(root, entry.name));
 }
 
-function findOverlayDirectories(root) {
+function findOverlayDirectories(root: string): string[] {
   if (!existsSync(root)) return [];
   return readdirSync(root, { withFileTypes: true })
     .filter((environment) => environment.isDirectory())

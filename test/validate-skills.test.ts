@@ -6,16 +6,16 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
+const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 
-function validate(example) {
+function validate(example: string) {
   return validateDirectory(`examples/skill-contract/${example}`);
 }
 
-function validateDirectory(directory) {
+function validateDirectory(directory: string) {
   return spawnSync(
     process.execPath,
-    ["bin/validate-skills.js", directory],
+    ["dist/bin/validate-skills.js", directory],
     { cwd: repositoryRoot, encoding: "utf8" },
   );
 }
