@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
+    "check-language": "npm run build && node dist/bin/check-language.js",
     "test": "npm run build && node --test dist/test/*.js",
     "validate-skills": "npm run build && node dist/bin/validate-skills.js"
   },
