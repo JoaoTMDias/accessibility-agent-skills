@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -98,6 +98,23 @@ test("check-language accepts English and detects Portuguese", () => {
     assert.equal(rejected.status, 1);
     assert.match(rejected.stderr, /Portuguese content detected/);
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test("check-language scans research and specification notes", () => {
+  const project = mkdtempSync(join(tmpdir(), "language-check-"));
+  try {
+    for (const directory of ["docs/research", "docs/specs"]) {
+      const file = join(project, directory, "portuguese.md");
+      mkdirSync(join(project, directory), { recursive: true });
+      writeFileSync(file, `O validador n${String.fromCharCode(227)}o apresenta erros claros.\n`);
+    }
+    execFileSync("git", ["init", "--quiet"], { cwd: project });
+    execFileSync("git", ["add", "docs"], { cwd: project });
+    const result = spawnSync(process.execPath, [join(root, "dist/bin/check-language.js")], { cwd: project, encoding: "utf8" });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /docs\/research\/portuguese\.md/);
+    assert.match(result.stderr, /docs\/specs\/portuguese\.md/);
+  } finally { rmSync(project, { recursive: true, force: true }); }
 });
 
 function createProject({ checklist = false, checklistContent = checklistContents, overlayReadme = false, overlayReadmeContent = "# Activation\n\nCopy this overlay manually.\n", overlayWithoutReadme = false } = {}) {
