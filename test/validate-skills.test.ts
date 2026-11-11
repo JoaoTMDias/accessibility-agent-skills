@@ -218,6 +218,23 @@ test("validate-skills exige instruções num README.md de overlay", () => {
   }
 });
 
+test("check-language aceita inglês e detecta português fora da allowlist", () => {
+  const directory = mkdtempSync(join(repositoryRoot, ".language-check-"));
+  const english = join(directory, "english.md");
+  const portuguese = join(directory, "portuguese.md");
+  try {
+    writeFileSync(english, "The validator reports clear errors.\n");
+    writeFileSync(portuguese, "O validador não apresenta erros claros.\n");
+    const accepted = spawnSync(process.execPath, ["dist/bin/check-language.js", english], { cwd: repositoryRoot, encoding: "utf8" });
+    const rejected = spawnSync(process.execPath, ["dist/bin/check-language.js", portuguese], { cwd: repositoryRoot, encoding: "utf8" });
+    assert.equal(accepted.status, 0, accepted.stderr);
+    assert.equal(rejected.status, 1);
+    assert.match(rejected.stderr, /Portuguese content detected/);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
 function createProject({ checklist = false, checklistContent = checklistContents, overlayReadme = false, overlayReadmeContent = "# Activação\n\nCopiar manualmente este overlay.\n", overlayWithoutReadme = false } = {}) {
   const project = mkdtempSync(join(repositoryRoot, ".validate-skills-"));
   const skill = join(project, "skills", "accessibility-review");
