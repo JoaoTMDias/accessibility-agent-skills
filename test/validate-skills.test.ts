@@ -86,7 +86,7 @@ test("validate-skills enforces checklists and overlay instructions", () => {
   }
 });
 
-test("check-language accepts English and detects Portuguese outside the allowlist", () => {
+test("check-language accepts English and detects Portuguese", () => {
   const directory = mkdtempSync(join(root, ".language-check-"));
   const english = join(directory, "english.md");
   const portuguese = join(directory, "portuguese.md");
