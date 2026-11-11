@@ -1,10 +1,10 @@
-# Documentação de domínio
+# Domain documentation
 
-## Antes de explorar
+## Before exploring
 
-- Ler `GLOSSARY.md`, se existir.
-- Ler ADRs relevantes em `docs/adr/`, se existirem.
-- Se não existirem, continuar sem os criar por defeito.
+- Read `GLOSSARY.md`, if present.
+- Read relevant ADRs in `docs/adr/`, if present.
+- If they do not exist, continue without creating them by default.
 
 O skill `domain-modeling` cria ou actualiza estes documentos quando resolver termos ou decisões reais.
 
@@ -17,4 +17,4 @@ GLOSSARY.md
 docs/adr/
 ```
 
-Usar os termos definidos no glossário. Se uma proposta contradisser um ADR, indicar esse conflito de forma explícita.
+Use the terms defined in the glossary. If a proposal conflicts with an ADR, state that conflict explicitly.

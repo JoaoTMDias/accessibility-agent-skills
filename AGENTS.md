@@ -2,12 +2,12 @@
 
 ### Issue tracker
 
-GitHub Issues em `JoaoTMDias/accessibility-agent-skills`. Veja `docs/agents/issue-tracker.md`.
+GitHub Issues in `JoaoTMDias/accessibility-agent-skills`. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-Usar `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human` e `wontfix`. Veja `docs/agents/triage-labels.md`.
+Use `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human` and `wontfix`. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Contexto único: `GLOSSARY.md` e `docs/adr/`. Veja `docs/agents/domain.md`.
+Single context: `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.

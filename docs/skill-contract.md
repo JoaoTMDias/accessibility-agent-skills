@@ -1,46 +1,29 @@
-# Contrato portátil de skill 1.0.0
+# Portable skill contract 1.0.0
 
-Este contrato define o núcleo portátil de um skill de acessibilidade. Aplica-se a cada directório `skills/<name>/` e ao seu ficheiro `SKILL.md`.
+This contract defines the portable core of an accessibility skill. It applies to every `skills/<name>/SKILL.md`.
 
-## Estrutura
+## Structure
 
-- O directório contém `SKILL.md` em UTF-8.
-- O valor de `name` coincide exactamente com o nome do directório.
-- Recursos adicionais são opcionais e não alteram o contrato.
+- The directory contains UTF-8 `SKILL.md`.
+- `name` exactly matches the directory name.
+- Additional resources are optional.
 
-## Metadados obrigatórios
+## Required metadata
 
-O `SKILL.md` começa com frontmatter YAML delimitado por `---` e inclui:
+`SKILL.md` starts with YAML frontmatter and includes non-empty `name` and `description` values.
 
-- `name`: texto que coincide exactamente com o nome do directório.
-- `description`: texto não vazio que descreve o objectivo do skill.
+## Required sections
 
-## Secções obrigatórias
+The Markdown body starts with these level-two headings in order: `Purpose and boundaries`, `Required inputs`, `Expected outcome`, `Sources`, `Optional tools`, `Limitations and uncertainty`, and `Quality criteria`.
 
-O corpo Markdown começa, com estes títulos exactos de nível 2 e por esta ordem, pelas sete secções seguintes:
+## Sources and references
 
-1. `Purpose and boundaries`
-2. `Required inputs`
-3. `Expected outcome`
-4. `Sources`
-5. `Optional tools`
-6. `Limitations and uncertainty`
-7. `Quality criteria`
+External sources use `- [Title](https://example.org/source) — Responsible organisation — version-or-date`. Versions use dot-separated numbers and access dates use `YYYY-MM-DD`. Internal references are relative to `SKILL.md`, resolve to existing files and remain inside the repository. When no source applies, use `Not applicable: <reason>`.
 
-Secções adicionais são permitidas apenas depois destas sete, desde que não alterem o significado destas regras.
+## Checklists and overlays
 
-## Fontes e referências
+Every real skill has `CHECKLIST.md` with populated `## Activation`, `## Missing input`, `## Negative case` and `## Expected result` sections. Examples do not require a checklist. Overlays are optional at `overlays/<environment>/<name>/` and include `README.md` with `# Activation` or `# Installation` instructions.
 
-Em `Sources`, cada fonte externa declarada usa uma entrada Markdown no formato `- [Título](https://exemplo.pt/fonte) — Entidade responsável — versão-ou-data`. O URL é directo e usa `https://`; a versão usa números separados por pontos (por exemplo, `2.2`) ou a data de consulta usa `YYYY-MM-DD`. Cada referência interna declarada usa um link Markdown relativo ao directório do `SKILL.md`, aponta para um ficheiro existente e não sai do repositório. Quando não houver fontes aplicáveis, a secção indica `Não se aplica: <motivo>`.
+## Local validation
 
-O validador confirma apenas esta estrutura e a existência de referências locais. Não abre URLs nem determina se uma fonte é primária, relevante ou suficiente; essa avaliação pertence à revisão humana.
-
-## Checklist e overlays
-
-Cada skill real inclui um `CHECKLIST.md` manual com quatro secções de nível 2, cada uma com conteúdo: `Activação`, `Entrada em falta`, `Caso negativo` e `Resultado esperado`. Os exemplos em `examples/` não exigem checklist.
-
-Os overlays são opcionais e vivem em `overlays/<ambiente>/<nome>/`. Cada overlay existente inclui um `README.md` com uma secção de nível 1 `Activação` ou `Instalação` e instruções manuais. A validação confirma a estrutura, não executa essas instruções.
-
-## Validação local
-
-`npm run validate-skills` valida todos os núcleos directamente em `skills/`. Para validar outro directório com a mesma estrutura, execute `npm run validate-skills -- <directório>`. O comando termina com código diferente de zero e indica o ficheiro ou directório e a regra violada quando encontra erros.
+`npm run validate-skills` validates portable cores directly in `skills/`. It exits non-zero and identifies the violated file or directory rule.

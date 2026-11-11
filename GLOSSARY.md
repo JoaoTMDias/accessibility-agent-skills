@@ -1,13 +1,13 @@
 # Accessibility Agent Skills
 
-Termos usados para definir e distribuir skills de acessibilidade portáteis.
+Terms used to define and distribute portable accessibility skills.
 
-## Linguagem
+## Language
 
-**Overlay de ambiente**:
-Ficheiro ou conjunto de ficheiros específico de Claude Code ou Codex. Contém configuração que não faz parte do núcleo portátil de um skill.
-_Evitar_: configuração do skill, extensão portátil
+**Environment overlay**:
+A Claude Code- or Codex-specific file or file set. It contains configuration that is not part of a skill's portable core.
+_Avoid_: skill configuration, portable extension
 
-**Núcleo portátil**:
-Conteúdo comum de um skill, em `SKILL.md`, que funciona em Claude Code e Codex sem depender das configurações de um ambiente.
-_Evitar_: skill universal, pacote único
+**Portable core**:
+The shared content of a skill, in `SKILL.md`, that works in Claude Code and Codex without relying on environment configuration.
+_Avoid_: universal skill, single package
