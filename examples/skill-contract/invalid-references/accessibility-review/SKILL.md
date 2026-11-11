@@ -1,36 +1,36 @@
 ---
 name: accessibility-review
-description: Analisa uma interface segundo requisitos de acessibilidade.
+description: Analyses an interface against accessibility requirements.
 ---
 
 ## Purpose and boundaries
 
-Analisa evidência disponível e não declara conformidade global.
+Analyses available evidence and does not claim overall conformance.
 
 ## Required inputs
 
-Recebe uma interface e o respectivo contexto de utilização.
+Accepts an interface and its usage context.
 
 ## Expected outcome
 
-Devolve achados com evidência, método e limites.
+Returns findings with evidence, method and limitations.
 
 ## Sources
 
-- [Método inexistente](references/ausente.md)
-- [Ficheiro fora do repositório](../../../../../../fora-do-repositorio.md)
-- [Directório](references)
-- [Âncora](#metodo)
-- [Caminho absoluto](/docs/skill-contract.md)
+- [Missing method](references/missing.md)
+- [File outside the repository](../../../../../../outside-repository.md)
+- [Directory](references)
+- [Anchor](#method)
+- [Absolute path](/docs/skill-contract.md)
 
 ## Optional tools
 
-Não se aplica: a análise pode ser manual.
+Not applicable: the analysis may be manual.
 
 ## Limitations and uncertainty
 
-Não substitui testes com pessoas nem uma auditoria completa.
+Does not replace testing with people or a complete audit.
 
 ## Quality criteria
 
-Cada achado identifica evidência e limitação.
+Each finding identifies evidence and a limitation.

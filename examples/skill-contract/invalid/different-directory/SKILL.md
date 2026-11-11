@@ -4,24 +4,24 @@ name: invalid_name
 
 ## Purpose and boundaries
 
-Exemplo inválido para validar diagnósticos.
+Invalid example for validating diagnostics.
 
 ## Required inputs
 
-Não aplicável.
+Not applicable.
 
 ## Expected outcome
 
-Não aplicável.
+Not applicable.
 
 ## Sources
 
-Não aplicável.
+Not applicable.
 
 ## Optional tools
 
-Não aplicável.
+Not applicable.
 
 ## Limitations and uncertainty
 
-Não aplicável.
+Not applicable.

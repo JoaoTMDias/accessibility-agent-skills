@@ -1,11 +1,11 @@
-# Etiquetas de triage
+# Triage labels
 
-| Papel canónico | Etiqueta no tracker | Significado |
+| Canonical role | Tracker label | Meaning |
 | --- | --- | --- |
-| `needs-triage` | `needs-triage` | Requer avaliação. |
-| `needs-info` | `needs-info` | Aguarda informação. |
-| `ready-for-agent` | `ready-for-agent` | Está pronto para um agente. |
-| `ready-for-human` | `ready-for-human` | Requer trabalho humano. |
-| `wontfix` | `wontfix` | Não será tratado. |
+| `needs-triage` | `needs-triage` | Needs assessment. |
+| `needs-info` | `needs-info` | Awaiting information. |
+| `ready-for-agent` | `ready-for-agent` | Ready for an agent. |
+| `ready-for-human` | `ready-for-human` | Requires human work. |
+| `wontfix` | `wontfix` | Will not be addressed. |
 
-Usar a etiqueta correspondente quando um skill referir um destes papéis.
+Use the matching label when a skill refers to one of these roles.

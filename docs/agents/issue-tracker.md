@@ -1,21 +1,21 @@
 # Issue tracker: GitHub
 
-Os tickets e especificações deste projecto vivem em GitHub Issues. Usar `gh` para ler, criar, comentar, etiquetar e fechar issues.
+This project's tickets and specifications live in GitHub Issues. Use `gh` to read, create, comment on, label and close issues.
 
-## Convenções
+## Conventions
 
-- Criar issue: `gh issue create --title "..." --body "..."`.
-- Ler issue: `gh issue view <numero>`.
-- Listar issues: `gh issue list`.
-- Aplicar ou remover etiqueta: `gh issue edit <numero> --add-label "..."` ou `--remove-label "..."`.
-- Fechar issue: `gh issue close <numero> --comment "..."`.
+- Create an issue: `gh issue create --title "..." --body "..."`.
+- Read an issue: `gh issue view <number>`.
+- List issues: `gh issue list`.
+- Add or remove a label: `gh issue edit <number> --add-label "..."` or `--remove-label "..."`.
+- Close an issue: `gh issue close <number> --comment "..."`.
 
-Inferir o repositório a partir de `origin`.
+Infer the repository from `origin`.
 
-## Pull requests como superfície de triage
+## Pull requests as a triage surface
 
-**Não.** Pull requests externos não entram automaticamente no fluxo de triage.
+**No.** External pull requests do not automatically enter the triage flow.
 
-## Publicar ou obter tickets
+## Publishing or retrieving issues
 
-Quando um skill pedir para publicar no tracker, criar uma GitHub Issue. Quando pedir o ticket relevante, ler a issue correspondente.
+When a skill asks to publish to the tracker, create a GitHub Issue. When it asks for the relevant issue, read that issue.

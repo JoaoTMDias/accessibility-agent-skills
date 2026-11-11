@@ -1,3 +1,3 @@
 ## Purpose and boundaries
 
-Exemplo inválido sem metadados.
+Invalid example without metadata.
