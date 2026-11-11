@@ -1,32 +1,32 @@
 ---
 name: sections-out-of-order
-description: Exercita a ordem das secções obrigatórias.
+description: Exercises the order of required sections.
 ---
 
 ## Required inputs
 
-Não aplicável.
+Not applicable.
 
 ## Purpose and boundaries
 
-Não aplicável.
+Not applicable.
 
 ## Expected outcome
 
-Não aplicável.
+Not applicable.
 
 ## Sources
 
-Não aplicável.
+Not applicable.
 
 ## Optional tools
 
-Não aplicável.
+Not applicable.
 
 ## Limitations and uncertainty
 
-Não aplicável.
+Not applicable.
 
 ## Quality criteria
 
-Não aplicável.
+Not applicable.

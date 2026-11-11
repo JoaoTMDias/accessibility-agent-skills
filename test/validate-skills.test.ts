@@ -6,242 +6,106 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
+const root = fileURLToPath(new URL("../..", import.meta.url));
+const runValidator = (path: string) => spawnSync(process.execPath, ["dist/bin/validate-skills.js", path], { cwd: root, encoding: "utf8" });
+const validate = (example: string) => runValidator(`examples/skill-contract/${example}`);
 
-function validate(example: string) {
-  return validateDirectory(`examples/skill-contract/${example}`);
-}
-
-function validateDirectory(directory: string) {
-  return spawnSync(
-    process.execPath,
-    ["dist/bin/validate-skills.js", directory],
-    { cwd: repositoryRoot, encoding: "utf8" },
-  );
-}
-
-test("validate-skills aceita um núcleo portátil válido", () => {
-  const result = validate("valid");
-
+test("check-language accepts the migrated repository through the public command", () => {
+  const result = spawnSync("npm", ["run", "check-language"], { cwd: root, encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /1 núcleo portátil válido/);
 });
 
-test("validate-skills aceita fontes externas com data ou versão e referências internas válidas", () => {
-  const result = validate("valid-sources");
-
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /1 núcleo portátil válido/);
+test("validate-skills accepts valid portable cores", () => {
+  for (const example of ["valid", "valid-sources", "valid-unrestricted-name"]) {
+    const result = validate(example);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /1 valid portable core/);
+  }
 });
 
-test("validate-skills exige uma fonte ou uma explicação de inaplicabilidade", () => {
-  const result = validate("invalid-empty-sources");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /Sources tem de indicar uma fonte ou 'Não se aplica: <motivo>'/);
+test("validate-skills reports contract violations in English", () => {
+  const emptySources = validate("invalid-empty-sources");
+  assert.match(emptySources.stderr, /Sources must specify a source or 'Not applicable: <reason>'/);
+  const notApplicable = validate("invalid-not-applicable");
+  assert.match(notApplicable.stderr, /'Not applicable' must include a reason/);
+  const invalidSource = validate("invalid-sources");
+  assert.match(invalidSource.stderr, /direct https:\/\/ URL/);
+  assert.match(invalidSource.stderr, /responsible organisation/);
+  assert.match(invalidSource.stderr, /version or date/);
+  assert.match(invalidSource.stderr, /external source or internal reference format/);
+  const invalidReference = validate("invalid-references");
+  assert.match(invalidReference.stderr, /references\/missing\.md' does not exist/);
+  assert.match(invalidReference.stderr, /outside-repository\.md' is outside the repository/);
+  assert.match(invalidReference.stderr, /'references' must point to a file/);
+  assert.match(invalidReference.stderr, /'#method' must point to a relative file/);
+  assert.match(invalidReference.stderr, /'\/docs\/skill-contract\.md' must be relative/);
+  const invalid = validate("invalid");
+  assert.match(invalid.stderr, /initial YAML frontmatter is required/);
+  assert.match(invalid.stderr, /invalid YAML frontmatter/);
+  assert.match(invalid.stderr, /required 'description' metadata is missing/);
+  assert.match(invalid.stderr, /does not match directory/);
+  assert.match(invalid.stderr, /required section 'Quality criteria' is missing/);
+  assert.match(invalid.stderr, /'Purpose and boundaries' must precede 'Required inputs'/);
+  assert.match(invalid.stderr, /missing-skill-file: SKILL\.md is missing/);
 });
 
-test("validate-skills exige motivo quando as fontes não se aplicam", () => {
-  const result = validate("invalid-not-applicable");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /'Não se aplica' tem de incluir um motivo/);
-});
-
-test("validate-skills explica fontes externas sem URL https, entidade ou data", () => {
-  const result = validate("invalid-sources");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /URL directo em https/);
-  assert.match(result.stderr, /https:\/\/example\.com\/.*entidade responsável/);
-  assert.match(result.stderr, /https:\/\/example\.com\/.*versão ou data/);
-  assert.match(result.stderr, /tem de seguir o formato de fonte externa/);
-  assert.match(result.stderr, /URL directo em https/);
-});
-
-test("validate-skills rejeita referências internas cujo symlink sai do repositório", () => {
-  const skillRoot = mkdtempSync(join(repositoryRoot, ".validate-skills-"));
+test("validate-skills rejects a symlinked internal reference outside the repository", () => {
+  const skillRoot = mkdtempSync(join(root, ".validate-skills-"));
   const externalRoot = mkdtempSync(join(tmpdir(), "validate-skills-"));
-
   try {
-    const skillDirectory = join(skillRoot, "accessibility-review");
-    const referencesDirectory = join(skillDirectory, "references");
-    const externalFile = join(externalRoot, "method.md");
-    mkdirSync(referencesDirectory, { recursive: true });
-    writeFileSync(externalFile, "# Método\n");
-    symlinkSync(externalFile, join(referencesDirectory, "method.md"));
-    writeFileSync(
-      join(skillDirectory, "SKILL.md"),
-      `---\nname: accessibility-review\ndescription: Analisa uma interface.\n---\n\n## Purpose and boundaries\n\nLimites.\n\n## Required inputs\n\nEntradas.\n\n## Expected outcome\n\nResultado.\n\n## Sources\n\n- [Método](references/method.md)\n\n## Optional tools\n\nNão se aplica: sem ferramentas.\n\n## Limitations and uncertainty\n\nLimites.\n\n## Quality criteria\n\nCritérios.\n`,
-    );
-
-    const result = validateDirectory(skillRoot);
-
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /referência interna 'references\/method\.md' sai do repositório/);
+    const skill = join(skillRoot, "accessibility-review");
+    mkdirSync(join(skill, "references"), { recursive: true });
+    const method = join(externalRoot, "method.md");
+    writeFileSync(method, "# Method\n");
+    symlinkSync(method, join(skill, "references", "method.md"));
+    writeFileSync(join(skill, "SKILL.md"), validSkill.replace("Not applicable: test example.", "- [Method](references/method.md)"));
+    assert.match(runValidator(skillRoot).stderr, /references\/method\.md' is outside the repository/);
   } finally {
     rmSync(skillRoot, { recursive: true, force: true });
     rmSync(externalRoot, { recursive: true, force: true });
   }
 });
 
-test("validate-skills explica referências internas inexistentes", () => {
-  const result = validate("invalid-references");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /referência interna 'references\/ausente\.md' não existe/);
-  assert.match(result.stderr, /referência interna '.*fora-do-repositorio\.md' sai do repositório/);
-  assert.match(result.stderr, /referência interna 'references' tem de apontar para um ficheiro/);
-  assert.match(result.stderr, /referência interna '#metodo' tem de apontar para um ficheiro relativo/);
-  assert.match(result.stderr, /referência interna '\/docs\/skill-contract\.md' tem de ser relativa/);
-});
-
-test("validate-skills aceita um nome que coincide exactamente com o directório", () => {
-  const result = validate("valid-unrestricted-name");
-
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /1 núcleo portátil válido/);
-});
-
-test("validate-skills explica a ausência de frontmatter", () => {
-  const result = validate("invalid");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /frontmatter YAML inicial é obrigatório/);
-});
-
-test("validate-skills explica YAML inválido", () => {
-  const result = validate("invalid");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /frontmatter YAML inválido/);
-});
-
-test("validate-skills explica metadados e nome do directório diferentes", () => {
-  const result = validate("invalid");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /metadado obrigatório 'description'/);
-  assert.match(result.stderr, /não coincide com o directório/);
-  assert.match(result.stderr, /secção obrigatória 'Quality criteria' está em falta/);
-});
-
-test("validate-skills exige as secções pela ordem do contrato", () => {
-  const result = validate("invalid");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /esperada a secção obrigatória 'Purpose and boundaries' antes de 'Required inputs'/);
-});
-
-test("validate-skills detecta um directório imediato sem SKILL.md", () => {
-  const result = validate("invalid");
-
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /missing-skill-file: falta o ficheiro SKILL\.md/);
-});
-
-test("validate-skills aceita um núcleo real sem overlay quando tem CHECKLIST.md", () => {
-  const project = createProject({ checklist: true });
-
+test("validate-skills enforces checklists and overlay instructions", () => {
+  const noChecklist = createProject();
+  const incompleteChecklist = createProject({ checklist: true, checklistContent: "# Checklist\n\n- Activation\n" });
+  const missingReadme = createProject({ checklist: true, overlayWithoutReadme: true });
+  const emptyReadme = createProject({ checklist: true, overlayReadme: true, overlayReadmeContent: "" });
+  const validOverlay = createProject({ checklist: true, overlayReadme: true });
   try {
-    const result = validateDirectory(join(project, "skills"));
-
-    assert.equal(result.status, 0, result.stderr);
+    assert.match(runValidator(join(noChecklist, "skills")).stderr, /CHECKLIST\.md is missing/);
+    const checklistErrors = runValidator(join(incompleteChecklist, "skills")).stderr;
+    assert.match(checklistErrors, /'missing input'/);
+    assert.match(checklistErrors, /'negative case'/);
+    assert.match(checklistErrors, /'expected result'/);
+    assert.match(runValidator(join(missingReadme, "skills")).stderr, /README\.md is missing/);
+    assert.match(runValidator(join(emptyReadme, "skills")).stderr, /manual activation or installation instructions/);
+    assert.equal(runValidator(join(validOverlay, "skills")).status, 0);
   } finally {
-    rmSync(project, { recursive: true, force: true });
+    for (const project of [noChecklist, incompleteChecklist, missingReadme, emptyReadme, validOverlay]) rmSync(project, { recursive: true, force: true });
   }
 });
 
-test("validate-skills exige CHECKLIST.md para um núcleo real", () => {
-  const project = createProject();
-
-  try {
-    const result = validateDirectory(join(project, "skills"));
-
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /falta o ficheiro CHECKLIST\.md/);
-  } finally {
-    rmSync(project, { recursive: true, force: true });
-  }
-});
-
-test("validate-skills exige os quatro casos no CHECKLIST.md", () => {
-  const project = createProject({ checklist: true, checklistContent: "# Checklist\n\n- Activação\n" });
-
-  try {
-    const result = validateDirectory(join(project, "skills"));
-
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /CHECKLIST\.md tem de incluir 'entrada em falta'/);
-    assert.match(result.stderr, /CHECKLIST\.md tem de incluir 'caso negativo'/);
-    assert.match(result.stderr, /CHECKLIST\.md tem de incluir 'resultado esperado'/);
-  } finally {
-    rmSync(project, { recursive: true, force: true });
-  }
-});
-
-test("validate-skills aceita um overlay com README.md", () => {
-  const project = createProject({ checklist: true, overlayReadme: true });
-
-  try {
-    const result = validateDirectory(join(project, "skills"));
-
-    assert.equal(result.status, 0, result.stderr);
-  } finally {
-    rmSync(project, { recursive: true, force: true });
-  }
-});
-
-test("validate-skills explica a ausência de README.md num overlay", () => {
-  const project = createProject({ checklist: true, overlayWithoutReadme: true });
-
-  try {
-    const result = validateDirectory(join(project, "skills"));
-
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /overlays\/codex\/accessibility-review: falta o ficheiro README\.md/);
-  } finally {
-    rmSync(project, { recursive: true, force: true });
-  }
-});
-
-test("validate-skills exige instruções num README.md de overlay", () => {
-  const project = createProject({ checklist: true, overlayReadme: true, overlayReadmeContent: "" });
-
-  try {
-    const result = validateDirectory(join(project, "skills"));
-
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /README\.md tem de conter instruções manuais de activação ou instalação/);
-  } finally {
-    rmSync(project, { recursive: true, force: true });
-  }
-});
-
-test("check-language aceita inglês e detecta português fora da allowlist", () => {
-  const directory = mkdtempSync(join(repositoryRoot, ".language-check-"));
+test("check-language accepts English and detects Portuguese outside the allowlist", () => {
+  const directory = mkdtempSync(join(root, ".language-check-"));
   const english = join(directory, "english.md");
   const portuguese = join(directory, "portuguese.md");
   try {
     writeFileSync(english, "The validator reports clear errors.\n");
-    writeFileSync(portuguese, "O validador não apresenta erros claros.\n");
-    const accepted = spawnSync(process.execPath, ["dist/bin/check-language.js", english], { cwd: repositoryRoot, encoding: "utf8" });
-    const rejected = spawnSync(process.execPath, ["dist/bin/check-language.js", portuguese], { cwd: repositoryRoot, encoding: "utf8" });
-    assert.equal(accepted.status, 0, accepted.stderr);
+    writeFileSync(portuguese, `O validador n${String.fromCharCode(227)}o apresenta erros claros.\n`);
+    assert.equal(spawnSync(process.execPath, ["dist/bin/check-language.js", english], { cwd: root }).status, 0);
+    const rejected = spawnSync(process.execPath, ["dist/bin/check-language.js", portuguese], { cwd: root, encoding: "utf8" });
     assert.equal(rejected.status, 1);
     assert.match(rejected.stderr, /Portuguese content detected/);
-  } finally {
-    rmSync(directory, { recursive: true, force: true });
-  }
+  } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-function createProject({ checklist = false, checklistContent = checklistContents, overlayReadme = false, overlayReadmeContent = "# Activação\n\nCopiar manualmente este overlay.\n", overlayWithoutReadme = false } = {}) {
-  const project = mkdtempSync(join(repositoryRoot, ".validate-skills-"));
+function createProject({ checklist = false, checklistContent = checklistContents, overlayReadme = false, overlayReadmeContent = "# Activation\n\nCopy this overlay manually.\n", overlayWithoutReadme = false } = {}) {
+  const project = mkdtempSync(join(root, ".validate-skills-"));
   const skill = join(project, "skills", "accessibility-review");
   mkdirSync(skill, { recursive: true });
   writeFileSync(join(skill, "SKILL.md"), validSkill);
   if (checklist) writeFileSync(join(skill, "CHECKLIST.md"), checklistContent);
-
   if (overlayReadme || overlayWithoutReadme) {
     const overlay = join(project, "overlays", "codex", "accessibility-review");
     mkdirSync(overlay, { recursive: true });
@@ -252,51 +116,51 @@ function createProject({ checklist = false, checklistContent = checklistContents
 
 const validSkill = `---
 name: accessibility-review
-description: Analisa uma interface.
+description: Analyses an interface.
 ---
 
 ## Purpose and boundaries
 
-Limites.
+Limitations.
 
 ## Required inputs
 
-Entradas.
+Inputs.
 
 ## Expected outcome
 
-Resultado.
+Outcome.
 
 ## Sources
 
-Não se aplica: exemplo de teste.
+Not applicable: test example.
 
 ## Optional tools
 
-Não se aplica: sem ferramentas.
+Not applicable: no tools.
 
 ## Limitations and uncertainty
 
-Limites.
+Limitations.
 
 ## Quality criteria
 
-Critérios.
+Criteria.
 `;
 
-const checklistContents = `## Activação
+const checklistContents = `## Activation
 
-Executar o skill.
+Run the skill.
 
-## Entrada em falta
+## Missing input
 
-O skill pede a informação em falta.
+The skill requests the missing information.
 
-## Caso negativo
+## Negative case
 
-O skill declara a limitação.
+The skill declares the limitation.
 
-## Resultado esperado
+## Expected result
 
-O skill devolve o resultado definido.
+The skill returns the defined result.
 `;

@@ -18,20 +18,20 @@ type Frontmatter = { error: string } | { fields: Map<string, unknown>; body: str
 
 function parseFrontmatter(contents: string): Frontmatter {
   const lines = contents.split(/\r?\n/);
-  if (lines[0] !== "---") return { error: "o frontmatter YAML inicial é obrigatório" };
+  if (lines[0] !== "---") return { error: "initial YAML frontmatter is required" };
 
   const closingDelimiter = lines.indexOf("---", 1);
-  if (closingDelimiter === -1) return { error: "o frontmatter YAML inicial é obrigatório" };
+  if (closingDelimiter === -1) return { error: "initial YAML frontmatter is required" };
 
   const document = YAML.parseDocument(lines.slice(1, closingDelimiter).join("\n"), {
     uniqueKeys: true,
   });
   if (document.errors.length > 0) {
-    return { error: `frontmatter YAML inválido: ${document.errors[0].message}` };
+    return { error: `invalid YAML frontmatter: ${document.errors[0].message}` };
   }
 
   if (!YAML.isMap(document.contents)) {
-    return { error: "o frontmatter YAML deve ser um mapa de metadados" };
+    return { error: "YAML frontmatter must be a metadata map" };
   }
 
   const fields = new Map<string, unknown>();
@@ -52,10 +52,10 @@ function validateSkill(skillFile: string, requiresChecklist: boolean): Validatio
   const { fields, body } = parsed;
   const name = fields.get("name");
   const description = fields.get("description");
-  if (!name) errors.push("o metadado obrigatório 'name' está em falta");
-  if (!description) errors.push("o metadado obrigatório 'description' está em falta");
+  if (!name) errors.push("required 'name' metadata is missing");
+  if (!description) errors.push("required 'description' metadata is missing");
   if (name && name !== basename(join(skillFile, ".."))) {
-    errors.push(`o metadado 'name' ('${name}') não coincide com o directório ('${basename(join(skillFile, ".."))}')`);
+    errors.push(`'name' metadata ('${name}') does not match directory ('${basename(join(skillFile, ".."))}')`);
   }
 
   const headings = [...body.matchAll(/^##\s+(.+?)\s*$/gm)].map((match) => match[1]);
@@ -63,9 +63,9 @@ function validateSkill(skillFile: string, requiresChecklist: boolean): Validatio
     const heading = headings[index];
     if (heading === section) continue;
     if (heading === undefined) {
-      errors.push(`a secção obrigatória '${section}' está em falta`);
+      errors.push(`required section '${section}' is missing`);
     } else {
-      errors.push(`esperada a secção obrigatória '${section}' antes de '${heading}'`);
+      errors.push(`required section '${section}' must precede '${heading}'`);
     }
     break;
   }
@@ -78,14 +78,14 @@ function validateSkill(skillFile: string, requiresChecklist: boolean): Validatio
 function validateChecklist(skillFile: string, errors: ValidationErrors): void {
   const checklist = join(skillFile, "..", "CHECKLIST.md");
   if (!existsSync(checklist) || !statSync(checklist).isFile()) {
-    errors.push("falta o ficheiro CHECKLIST.md");
+    errors.push("CHECKLIST.md is missing");
     return;
   }
   const contents = readFileSync(checklist, "utf8").toLowerCase();
-  for (const item of ["activação", "entrada em falta", "caso negativo", "resultado esperado"]) {
+  for (const item of ["activation", "missing input", "negative case", "expected result"]) {
     const section = new RegExp(`^## ${item}\\s*\\n\\s*\\S`, "m");
     if (!section.test(contents)) {
-      errors.push(`CHECKLIST.md tem de incluir '${item}'`);
+      errors.push(`CHECKLIST.md must include '${item}'`);
     }
   }
 }
@@ -98,19 +98,19 @@ function validateSources(body: string, skillFile: string, errors: ValidationErro
   for (const line of sources.split(/\r?\n/)) {
     const entry = line.trim();
     if (!entry) continue;
-    if (/^não se aplica:/i.test(entry)) {
-      if (/^não se aplica:\s+\S/i.test(entry)) hasSourceOrReason = true;
-      else errors.push("'Não se aplica' tem de incluir um motivo");
+    if (/^not applicable:/i.test(entry)) {
+      if (/^not applicable:\s+\S/i.test(entry)) hasSourceOrReason = true;
+      else errors.push("'Not applicable' must include a reason");
       continue;
     }
-    if (/^não se aplica(?:\.|$)/i.test(entry)) {
-      errors.push("'Não se aplica' tem de incluir um motivo");
+    if (/^not applicable(?:\.|$)/i.test(entry)) {
+      errors.push("'Not applicable' must include a reason");
       continue;
     }
 
     const link = entry.match(/^- \[[^\]]+\]\(([^)]+)\)(?:\s+—\s+(.+))?\s*$/);
     if (!link) {
-      errors.push("a entrada em Sources tem de seguir o formato de fonte externa ou referência interna");
+      errors.push("a Sources entry must follow the external source or internal reference format");
       hasSourceOrReason = true;
       continue;
     }
@@ -125,7 +125,7 @@ function validateSources(body: string, skillFile: string, errors: ValidationErro
   }
 
   if (!hasSourceOrReason) {
-    errors.push("Sources tem de indicar uma fonte ou 'Não se aplica: <motivo>'");
+    errors.push("Sources must specify a source or 'Not applicable: <reason>'");
   }
 }
 
@@ -137,25 +137,25 @@ function validateExternalSource(url: string, details: string | undefined, errors
     parsedUrl = undefined;
   }
   if (parsedUrl?.protocol !== "https:" || !parsedUrl.hostname) {
-    errors.push(`a fonte externa '${url}' tem de usar URL directo em https://`);
+    errors.push(`external source '${url}' must use a direct https:// URL`);
   }
 
   const [entity, versionOrDate, ...extra] = details?.split(" — ") ?? [];
   if (!entity) {
-    errors.push(`a fonte externa '${url}' tem de indicar entidade responsável`);
-    errors.push(`a fonte externa '${url}' tem de indicar versão ou data no formato YYYY-MM-DD`);
+    errors.push(`external source '${url}' must specify a responsible organisation`);
+    errors.push(`external source '${url}' must specify a version or date in YYYY-MM-DD format`);
     return;
   }
   if (!versionOrDate) {
-    if (isVersionOrDate(entity)) errors.push(`a fonte externa '${url}' tem de indicar entidade responsável`);
-    else errors.push(`a fonte externa '${url}' tem de indicar versão ou data no formato YYYY-MM-DD`);
+    if (isVersionOrDate(entity)) errors.push(`external source '${url}' must specify a responsible organisation`);
+    else errors.push(`external source '${url}' must specify a version or date in YYYY-MM-DD format`);
     return;
   }
-  if (extra.length > 0) errors.push(`a fonte externa '${url}' tem de indicar apenas entidade responsável e versão ou data`);
+  if (extra.length > 0) errors.push(`external source '${url}' must specify only a responsible organisation and version or date`);
   if (extra.length > 0) return;
 
   if (!isVersionOrDate(versionOrDate)) {
-    errors.push(`a fonte externa '${url}' tem de indicar versão ou data no formato YYYY-MM-DD`);
+    errors.push(`external source '${url}' must specify a version or date in YYYY-MM-DD format`);
   }
 }
 
@@ -166,23 +166,23 @@ function isVersionOrDate(value: string): boolean {
 function validateInternalReference(reference: string, skillDirectory: string, errors: ValidationErrors): void {
   const path = reference.split(/[?#]/, 1)[0];
   if (!path) {
-    errors.push(`a referência interna '${reference}' tem de apontar para um ficheiro relativo`);
+    errors.push(`internal reference '${reference}' must point to a relative file`);
     return;
   }
   if (path.startsWith("/")) {
-    errors.push(`a referência interna '${reference}' tem de ser relativa`);
+    errors.push(`internal reference '${reference}' must be relative`);
     return;
   }
   const target = resolve(skillDirectory, path);
   const repositoryRoot = realpathSync(process.cwd());
   if (isOutsideDirectory(target, repositoryRoot)) {
-    errors.push(`a referência interna '${reference}' sai do repositório`);
+    errors.push(`internal reference '${reference}' is outside the repository`);
   } else if (!existsSync(target)) {
-    errors.push(`a referência interna '${reference}' não existe`);
+    errors.push(`internal reference '${reference}' does not exist`);
   } else if (isOutsideDirectory(realpathSync(target), repositoryRoot)) {
-    errors.push(`a referência interna '${reference}' sai do repositório`);
+    errors.push(`internal reference '${reference}' is outside the repository`);
   } else if (!statSync(target).isFile()) {
-    errors.push(`a referência interna '${reference}' tem de apontar para um ficheiro`);
+    errors.push(`internal reference '${reference}' must point to a file`);
   }
 }
 
@@ -211,7 +211,7 @@ const requiresChecklist = !relative(process.cwd(), resolve(root)).split(sep).inc
 const failures = skillDirectories.flatMap((skillDirectory) => {
   const skillFile = join(skillDirectory, "SKILL.md");
   if (!existsSync(skillFile) || !statSync(skillFile).isFile()) {
-    return [`${relative(process.cwd(), skillDirectory)}: falta o ficheiro SKILL.md`];
+    return [`${relative(process.cwd(), skillDirectory)}: SKILL.md is missing`];
   }
   return validateSkill(skillFile, requiresChecklist).map((error) => `${relative(process.cwd(), skillFile)}: ${error}`);
 });
@@ -220,16 +220,16 @@ const overlaysRoot = join(root, "..", "overlays");
 for (const overlayDirectory of findOverlayDirectories(overlaysRoot)) {
   const readme = join(overlayDirectory, "README.md");
   if (!existsSync(readme) || !statSync(readme).isFile()) {
-    failures.push(`${relative(process.cwd(), overlayDirectory)}: falta o ficheiro README.md`);
-  } else if (!/^# (Activação|Instalação)\s*\n\s*\S/m.test(readFileSync(readme, "utf8"))) {
-    failures.push(`${relative(process.cwd(), readme)}: README.md tem de conter instruções manuais de activação ou instalação`);
+    failures.push(`${relative(process.cwd(), overlayDirectory)}: README.md is missing`);
+  } else if (!/^# (Activation|Installation)\s*\n\s*\S/m.test(readFileSync(readme, "utf8"))) {
+    failures.push(`${relative(process.cwd(), readme)}: README.md must contain manual activation or installation instructions`);
   }
 }
 
 if (failures.length > 0) {
-  console.error(`validate-skills: ${failures.length} erro(s):`);
+  console.error(`validate-skills: ${failures.length} error(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`validate-skills: ${skillDirectories.length} núcleo portátil válido(s).`);
+  console.log(`validate-skills: ${skillDirectories.length} valid portable core(s).`);
 }

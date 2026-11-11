@@ -1,3 +1,3 @@
-# Método de revisão
+# Review method
 
-Usar o método descrito no pedido.
+Use the method described in the request.

@@ -10,12 +10,12 @@ This project's tickets and specifications live in GitHub Issues. Use `gh` to rea
 - Add or remove a label: `gh issue edit <number> --add-label "..."` or `--remove-label "..."`.
 - Close an issue: `gh issue close <number> --comment "..."`.
 
-Inferir o repositório a partir de `origin`.
+Infer the repository from `origin`.
 
-## Pull requests como superfície de triage
+## Pull requests as a triage surface
 
-**Não.** Pull requests externos não entram automaticamente no fluxo de triage.
+**No.** External pull requests do not automatically enter the triage flow.
 
-## Publicar ou obter tickets
+## Publishing or retrieving issues
 
-Quando um skill pedir para publicar no tracker, criar uma GitHub Issue. Quando pedir o ticket relevante, ler a issue correspondente.
+When a skill asks to publish to the tracker, create a GitHub Issue. When it asks for the relevant issue, read that issue.

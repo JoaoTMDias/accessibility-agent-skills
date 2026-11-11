@@ -1,32 +1,32 @@
 ---
 name: Accessible Review!
-description: Analisa uma interface para identificar barreiras de acessibilidade.
+description: Analyses an interface to identify accessibility barriers.
 ---
 
 ## Purpose and boundaries
 
-Analisa interfaces fornecidas; não declara conformidade geral.
+Analyses supplied interfaces; does not claim overall conformance.
 
 ## Required inputs
 
-Recebe uma interface ou descrição verificável.
+Accepts an interface or verifiable description.
 
 ## Expected outcome
 
-Devolve achados com evidência.
+Returns findings with evidence.
 
 ## Sources
 
-Não se aplica: este exemplo valida apenas a estrutura base do contrato.
+Not applicable: this example validates only the contract's basic structure.
 
 ## Optional tools
 
-Pode usar inspeção manual quando disponível.
+May use manual inspection when available.
 
 ## Limitations and uncertainty
 
-Declara o que não foi testado.
+Declares what was not tested.
 
 ## Quality criteria
 
-Cada achado indica evidência e limite.
+Each finding identifies evidence and a limitation.

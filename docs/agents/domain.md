@@ -6,11 +6,11 @@
 - Read relevant ADRs in `docs/adr/`, if present.
 - If they do not exist, continue without creating them by default.
 
-O skill `domain-modeling` cria ou actualiza estes documentos quando resolver termos ou decisões reais.
+The `domain-modeling` skill creates or updates these documents when resolving real terms or decisions.
 
-## Estrutura
+## Structure
 
-Este é um projecto de contexto único:
+This is a single-context project:
 
 ```text
 GLOSSARY.md
