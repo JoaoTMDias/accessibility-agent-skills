@@ -1,63 +1,63 @@
-# Ferramentas oficiais para validar skills
+# Official tools for validating skills
 
-**Data de consulta:** 10-11-2026  
-**Âmbito:** ferramentas oficiais ou dos autores da Agent Skills specification que possam validar um `SKILL.md`. Inclui validação de formato, pacote e comportamento. Não selecciona nem instala ferramentas.
+**Access date:** 10-11-2026
+**Scope:** official tools, or tools from the authors of the Agent Skills specification, that can validate a `SKILL.md`. It includes format, package and behaviour validation. It does not select or install tools.
 
-## Conclusão curta
+## Short conclusion
 
-Não foi identificada uma ferramenta oficial, pronta a usar e baseada em Node.js/TypeScript, que valide o contrato deste projecto por completo. A única implementação de referência da Agent Skills specification, `skills-ref validate`, é Python e é declarada pelos autores como demonstrativa, não destinada a produção. As ferramentas oficiais de Claude Code e OpenAI validam sobretudo pacotes/configuração ou comportamento; não documentam regras para títulos Markdown arbitrários nem para referências locais do projecto.
+No official, ready-to-use Node.js/TypeScript tool was identified that validates this project's full contract. The only reference implementation of the Agent Skills specification, `skills-ref validate`, uses Python and is described by its authors as demonstrative rather than intended for production. Official Claude Code and OpenAI tools mainly validate packages, configuration or behaviour; they do not document rules for arbitrary Markdown headings or local project references.
 
-## Factos confirmados
+## Confirmed facts
 
-### Cobertura por ferramenta
+### Coverage by tool
 
-| Ferramenta | Runtime e estatuto | O que valida de forma documentada | Não documenta validar |
+| Tool | Runtime and status | Documented validation | Does not document validation of |
 | --- | --- | --- | --- |
-| [`skills-ref validate`](https://github.com/agentskills/agentskills/tree/main/skills-ref) | Python 3.11+; biblioteca de referência. Os próprios autores dizem que é apenas para demonstração e não para produção. | Existência do directório e de `SKILL.md`; frontmatter YAML; `name` e `description`; campos permitidos da specification; formato de `name`; correspondência entre nome do directório e `name`; limites de comprimento. | Corpo Markdown, títulos, URLs, links/caminhos relativos, existência de referências locais, activação ou resultados do skill. |
-| [Validação de submissão de plugins OpenAI](https://developers.openai.com/plugins/deploy/submission-errors) | Validação do serviço durante a submissão de um plugin; não é documentada como CLI local reutilizável. | Localização `skills/<nome>/SKILL.md`; ficheiro regular, legível e UTF-8; YAML que é um mapa; `name` não vazio; `description` não vazia e até 1 024 caracteres; corpo não vazio; nomes únicos no plugin. | As sete secções deste projecto, semântica dos títulos, links de fontes, recursos locais e adequação do comportamento. |
-| [`claude plugin validate`](https://code.claude.com/docs/en/plugin-evals) | Comando da CLI Claude Code para plugins. | A documentação diz que verifica ficheiros do plugin quanto a erros de sintaxe e de schema. | A documentação consultada não especifica regras para títulos Markdown personalizados, referências locais ou as sete secções. |
-| [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) | Comando da CLI Claude Code; executa prompts e graders sobre um plugin. | Comportamento observado face a casos de avaliação e graders definidos pelo autor. | Conformidade estrutural detalhada do `SKILL.md`; não substitui um linter de contrato. Requer chamadas ao modelo e tem custo associado. |
-| [Evals de skills no Codex](https://developers.openai.com/blog/eval-skills) | Orientação e fluxo de avaliação da OpenAI, baseado em execuções de cenários. | Qualidade e comportamento do skill perante tarefas e critérios de avaliação definidos pelo projecto. | Validação automática das sete secções, dos caminhos locais ou das regras de frontmatter como linter autónomo. |
+| [`skills-ref validate`](https://github.com/agentskills/agentskills/tree/main/skills-ref) | Python 3.11+; reference library. Its authors state that it is for demonstration only, not production. | Directory and `SKILL.md` existence; YAML frontmatter; `name` and `description`; allowed fields from the specification; `name` format; correspondence between directory name and `name`; length limits. | Markdown body, headings, URLs, relative links or paths, existence of local references, activation or skill outcomes. |
+| [OpenAI plugin submission validation](https://developers.openai.com/plugins/deploy/submission-errors) | Service validation during plugin submission; not documented as a reusable local CLI. | `skills/<name>/SKILL.md` location; regular, readable UTF-8 file; YAML that is a map; non-empty `name`; non-empty `description` of up to 1,024 characters; non-empty body; unique plugin names. | This project's seven sections, heading semantics, source links, local resources and behavioural suitability. |
+| [`claude plugin validate`](https://code.claude.com/docs/en/plugin-evals) | Claude Code CLI command for plugins. | Documentation says that it checks plugin files for syntax and schema errors. | The documentation checked does not specify rules for custom Markdown headings, local references or the seven sections. |
+| [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) | Claude Code CLI command; executes prompts and graders against a plugin. | Observed behaviour against evaluation cases and graders defined by the author. | Detailed structural conformance of `SKILL.md`; it does not replace a contract linter. It requires model calls and has associated cost. |
+| [Codex skill evals](https://developers.openai.com/blog/eval-skills) | OpenAI guidance and evaluation workflow based on scenario executions. | Skill quality and behaviour against project-defined tasks and evaluation criteria. | Automatic validation of the seven sections, local paths or frontmatter rules as a standalone linter. |
 
-### A implementação de referência `skills-ref`
+### The `skills-ref` reference implementation
 
-O repositório oficial [agentskills/agentskills](https://github.com/agentskills/agentskills) inclui `skills-ref`, uma biblioteca Python de referência. O seu [README](https://github.com/agentskills/agentskills/blob/main/skills-ref/README.md) expõe o comando `skills-ref validate path/to/skill`, mas declara explicitamente que a biblioteca é apenas demonstrativa e não se destina a produção. O [ficheiro do projecto](https://github.com/agentskills/agentskills/blob/main/skills-ref/pyproject.toml) requer Python 3.11 ou superior; não é uma ferramenta Node.js/TypeScript.
+The official [agentskills/agentskills](https://github.com/agentskills/agentskills) repository includes `skills-ref`, a Python reference library. Its [README](https://github.com/agentskills/agentskills/blob/main/skills-ref/README.md) exposes the `skills-ref validate path/to/skill` command, but explicitly states that the library is demonstrative only and not intended for production. Its [project file](https://github.com/agentskills/agentskills/blob/main/skills-ref/pyproject.toml) requires Python 3.11 or later; it is not a Node.js/TypeScript tool.
 
-O [código do validador](https://github.com/agentskills/agentskills/blob/main/skills-ref/src/skills_ref/validator.py) confirma que a cobertura é de estrutura e frontmatter: verifica o directório, `SKILL.md`, o YAML e as regras dos campos. Não contém análise do corpo Markdown ou resolução de recursos referidos.
+The [validator code](https://github.com/agentskills/agentskills/blob/main/skills-ref/src/skills_ref/validator.py) confirms coverage of structure and frontmatter: it checks the directory, `SKILL.md`, YAML and field rules. It does not analyse the Markdown body or resolve referenced resources.
 
-### O que a specification exige — e o que não exige
+### What the specification requires, and does not require
 
-A [Agent Skills specification](https://agentskills.io/specification) exige o directório do skill, `SKILL.md` e o frontmatter com `name` e `description`. Define campos opcionais e convenções de recursos, mas não impõe títulos para o corpo Markdown. Portanto, as sete secções e a verificação de referências locais são regras adicionais deste projecto, não regras que um validador genérico da specification tenha de conhecer.
+The [Agent Skills specification](https://agentskills.io/specification) requires the skill directory, `SKILL.md` and frontmatter with `name` and `description`. It defines optional fields and resource conventions, but does not impose body headings. Therefore, the seven sections and local-reference checks are additional project rules, not rules a generic specification validator must know.
 
-### Ferramentas oficiais por ambiente
+### Official tools by environment
 
-OpenAI documenta a estrutura dos skills e a validação de submissão de plugins, mas a documentação consultada não apresenta um validador local autónomo para `SKILL.md`. A página de [skills para a API](https://developers.openai.com/api/docs/guides/tools-skills) descreve a aceitação de bundles de skills; a página de [criação de plugins](https://developers.openai.com/plugins/build/skills) descreve como os skills entram num plugin. Nenhuma define uma CLI Node.js/TypeScript que aceite regras de corpo configuráveis.
+OpenAI documents skill structure and plugin-submission validation, but the documentation checked does not provide a standalone local validator for `SKILL.md`. The [API skills page](https://developers.openai.com/api/docs/guides/tools-skills) describes accepting skill bundles; the [plugin skills page](https://developers.openai.com/plugins/build/skills) describes how skills enter a plugin. Neither defines a Node.js/TypeScript CLI that accepts configurable body rules.
 
-Claude Code documenta `claude plugin validate` para sintaxe e schema do plugin e `claude plugin eval` para comportamento. Estes comandos são relevantes para uma distribuição Claude em formato plugin, mas não são documentados como validadores configuráveis do contrato portátil.
+Claude Code documents `claude plugin validate` for plugin syntax and schema, and `claude plugin eval` for behaviour. These commands are relevant to a Claude plugin distribution, but are not documented as configurable validators for the portable contract.
 
-## Inferências para o contrato deste projecto
+## Inferences for this project's contract
 
-1. **Nenhuma ferramenta oficial identificada cobre sem código adicional as sete secções nem as referências locais.** Isto decorre de a specification deixar o corpo livre e de as ferramentas documentadas se limitarem a formato, schema de plugin ou comportamento.
-2. **`skills-ref` pode ser uma referência útil das regras-base, mas não deve ser a dependência de produção assumida.** A limitação é declarada pelos próprios autores e o runtime é Python, não Node.js/TypeScript.
-3. **A validação em duas camadas mantém-se uma separação útil:** uma verificação estrutural do projecto para o contrato e avaliações comportamentais posteriores. As ferramentas de eval de Claude e OpenAI são evidência de que a segunda camada é um problema diferente de lint estrutural.
-4. **Para executar tudo numa única verificação local do projecto, será necessária uma regra própria ou um adaptador.** Esta é uma conclusão de cobertura, não uma decisão sobre linguagem, dependências ou implementação.
+1. **No official tool identified covers the seven sections and local references without additional code.** This follows because the specification leaves the body unconstrained and the documented tools are limited to format, plugin schema or behaviour.
+2. **`skills-ref` can be a useful reference for base rules, but should not be assumed as the production dependency.** Its authors state that limitation and its runtime is Python rather than Node.js/TypeScript.
+3. **Two-layer validation remains a useful separation:** a project structural check for the contract, followed by later behavioural evals. Claude and OpenAI eval tools show that the second layer is a different problem from structural linting.
+4. **A project rule or adapter will be required to run everything in one local project check.** This is a coverage conclusion, not a decision about language, dependencies or implementation.
 
-## Lacunas e questões em aberto
+## Gaps and open questions
 
-- A documentação de `claude plugin validate` não enumera cada regra de schema aplicada; só confirma a categoria “sintaxe e schema”. É necessário executar o comando numa amostra, ou obter documentação mais detalhada, antes de alegar regras específicas de `SKILL.md`.
-- Não foi identificada documentação oficial de uma API para estender `skills-ref validate` com títulos e referências próprios.
-- Não foi identificada uma ferramenta oficial Node.js/TypeScript que faça validação estática do contrato. Isto significa “não identificada nas fontes oficiais consultadas”, e não prova que não possa surgir ou existir fora desse conjunto.
-- Não foi avaliada nenhuma ferramenta de terceiros: estão fora do âmbito pedido, que privilegia fontes oficiais e os autores da specification.
+- The `claude plugin validate` documentation does not list every schema rule it applies; it only confirms the category of “syntax and schema”. The command needs to run against a sample, or more detailed documentation needs to be obtained, before claiming specific `SKILL.md` rules.
+- No official documentation was identified for an API that extends `skills-ref validate` with custom headings and references.
+- No official Node.js/TypeScript tool that statically validates the contract was identified. This means “not identified in the official sources checked”; it does not prove that one cannot appear or exist outside that set.
+- No third-party tool was assessed: it is outside the requested scope, which prioritises official sources and the specification authors.
 
-## Fontes primárias consultadas
+## Primary sources consulted
 
-- [Agent Skills — Specification](https://agentskills.io/specification) — consultada em 10-11-2026.
-- [agentskills/agentskills — repositório oficial](https://github.com/agentskills/agentskills) — consultado em 10-11-2026.
-- [skills-ref — README](https://github.com/agentskills/agentskills/blob/main/skills-ref/README.md) — consultado em 10-11-2026.
-- [skills-ref — `pyproject.toml`](https://github.com/agentskills/agentskills/blob/main/skills-ref/pyproject.toml) — consultado em 10-11-2026.
-- [skills-ref — `validator.py`](https://github.com/agentskills/agentskills/blob/main/skills-ref/src/skills_ref/validator.py) — consultado em 10-11-2026.
-- [OpenAI — erros de submissão de plugins](https://developers.openai.com/plugins/deploy/submission-errors) — consultada em 10-11-2026.
-- [OpenAI — skills para a API](https://developers.openai.com/api/docs/guides/tools-skills) — consultada em 10-11-2026.
-- [OpenAI — skills em plugins](https://developers.openai.com/plugins/build/skills) — consultada em 10-11-2026.
-- [OpenAI — Testing Agent Skills Systematically with Evals](https://developers.openai.com/blog/eval-skills) — consultada em 10-11-2026.
-- [Claude Code — plugin validation and evaluation](https://code.claude.com/docs/en/plugin-evals) — consultada em 10-11-2026.
+- [Agent Skills — Specification](https://agentskills.io/specification) — accessed on 10-11-2026.
+- [agentskills/agentskills — official repository](https://github.com/agentskills/agentskills) — accessed on 10-11-2026.
+- [skills-ref — README](https://github.com/agentskills/agentskills/blob/main/skills-ref/README.md) — accessed on 10-11-2026.
+- [skills-ref — `pyproject.toml`](https://github.com/agentskills/agentskills/blob/main/skills-ref/pyproject.toml) — accessed on 10-11-2026.
+- [skills-ref — `validator.py`](https://github.com/agentskills/agentskills/blob/main/skills-ref/src/skills_ref/validator.py) — accessed on 10-11-2026.
+- [OpenAI — plugin submission errors](https://developers.openai.com/plugins/deploy/submission-errors) — accessed on 10-11-2026.
+- [OpenAI — API skills](https://developers.openai.com/api/docs/guides/tools-skills) — accessed on 10-11-2026.
+- [OpenAI — skills in plugins](https://developers.openai.com/plugins/build/skills) — accessed on 10-11-2026.
+- [OpenAI — Testing Agent Skills Systematically with Evals](https://developers.openai.com/blog/eval-skills) — accessed on 10-11-2026.
+- [Claude Code — plugin validation and evaluation](https://code.claude.com/docs/en/plugin-evals) — accessed on 10-11-2026.

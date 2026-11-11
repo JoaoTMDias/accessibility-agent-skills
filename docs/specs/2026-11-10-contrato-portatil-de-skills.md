@@ -1,71 +1,71 @@
-# Contrato portátil de skills de acessibilidade 1.0.0
+# Portable accessibility skill contract 1.0.0
 
 ## Problem Statement
 
-O projecto precisa de uma forma consistente de criar e manter skills de acessibilidade que funcionem em Claude Code e Codex. Sem um contrato executável, cada skill pode adoptar estrutura, fontes e limites diferentes, e essa divergência só aparece tarde na revisão.
+The project needs a consistent way to create and maintain accessibility skills that work in Claude Code and Codex. Without an executable contract, each skill can adopt different structures, sources and boundaries, and that divergence only emerges late in review.
 
-Também não existe ainda uma verificação local ou no GitHub que impeça a integração de um skill estruturalmente inválido.
+There is also no local or GitHub check yet to prevent the integration of a structurally invalid skill.
 
 ## Solution
 
-Definir o contrato portátil `1.0.0`, criar o comando único `validate-skills` e configurar a validação no GitHub Actions.
+Define the portable contract `1.0.0`, create the single `validate-skills` command and configure validation in GitHub Actions.
 
-Cada skill terá um núcleo portátil em `SKILL.md`. As configurações específicas de ambiente ficarão em overlays opcionais, documentados mas sem instalador na primeira versão. A validação automática garante estrutura; a revisão humana garante qualidade, relevância das fontes e adequação das recomendações de acessibilidade.
+Each skill will have a portable core in `SKILL.md`. Environment-specific settings will remain in optional overlays, documented but without an installer in the first version. Automated validation guarantees structure; human review guarantees quality, source relevance and the suitability of accessibility recommendations.
 
 ## User Stories
 
-1. Como autor de um skill, quero uma estrutura comum, para saber exactamente o que cada skill tem de declarar.
-2. Como autor, quero que o núcleo portátil não dependa de Claude Code nem Codex, para o reutilizar entre ambientes.
-3. Como autor, quero declarar propósito e limites, para evitar que o skill seja usado fora do que consegue sustentar.
-4. Como autor, quero declarar entradas necessárias, para o agente pedir informação em falta em vez de inventar.
-5. Como autor, quero definir o resultado esperado, para tornar o comportamento avaliável.
-6. Como autor de recomendações de acessibilidade, quero citar fontes primárias adequadas, para fundamentar as recomendações.
-7. Como revisor, quero ver a entidade e a versão ou data de consulta de cada fonte, para poder avaliar a sua origem.
-8. Como utilizador, quero que o skill declare limitações e incertezas, para distinguir factos de conclusões condicionais.
-9. Como autor, quero declarar ferramentas opcionais e alternativas aceitáveis, para o skill manter transparência quando uma ferramenta falhar.
-10. Como mantenedor, quero executar um único comando de validação, para encontrar erros antes de abrir um pull request.
-11. Como revisor, quero que o GitHub Actions bloqueie alterações estruturalmente inválidas, para manter o contrato consistente.
-12. Como autor, quero exemplos internos válidos e inválidos, para compreender e testar as regras do validador.
-13. Como utilizador de um overlay de ambiente, quero instruções manuais curtas, para activar a configuração sem depender de conhecimento implícito.
-14. Como revisor humano, quero uma checklist curta de comportamento por skill, para confirmar activação, entradas em falta, limites e resultado.
-15. Como mantenedor, quero versionar o contrato separadamente, para saber quando uma alteração exige migrar os skills existentes.
+1. As a skill author, I want a common structure so that I know exactly what each skill must declare.
+2. As an author, I want the portable core not to depend on Claude Code or Codex so that I can reuse it across environments.
+3. As an author, I want to declare purpose and boundaries so that a skill is not used beyond what it can support.
+4. As an author, I want to declare required inputs so that the agent asks for missing information instead of inventing it.
+5. As an author, I want to define the expected outcome so that behaviour can be evaluated.
+6. As an author of accessibility recommendations, I want to cite suitable primary sources so that recommendations have an evidence base.
+7. As a reviewer, I want to see the responsible organisation and version or access date for every source so that I can assess its provenance.
+8. As a user, I want the skill to declare limitations and uncertainty so that I can distinguish facts from conditional conclusions.
+9. As an author, I want to declare optional tools and acceptable alternatives so that the skill remains transparent when a tool fails.
+10. As a maintainer, I want to run one validation command so that I can find errors before opening a pull request.
+11. As a reviewer, I want GitHub Actions to block structurally invalid changes so that the contract remains consistent.
+12. As an author, I want valid and invalid internal examples so that I can understand and test the validator rules.
+13. As a user of an environment overlay, I want short manual instructions so that I can enable the configuration without relying on implicit knowledge.
+14. As a human reviewer, I want a short per-skill behavioural checklist so that I can confirm activation, missing inputs, boundaries and outcome.
+15. As a maintainer, I want to version the contract separately so that I know when a change requires migration of existing skills.
 
 ## Implementation Decisions
 
-- O contrato terá a versão `1.0.0` e será a fonte de verdade para o núcleo portátil.
-- Cada núcleo portátil usa `SKILL.md` com os metadados base `name` e `description`.
-- Todos os núcleos incluem, por esta ordem, as secções `Purpose and boundaries`, `Required inputs`, `Expected outcome`, `Sources`, `Optional tools`, `Limitations and uncertainty` e `Quality criteria`.
-- Uma secção sem conteúdo aplicável explica explicitamente porquê. Secções adicionais são permitidas depois das sete obrigatórias.
-- As fontes externas usam URL directo `https://`, entidade responsável e versão ou data de consulta no formato `YYYY-MM-DD`. Referências internas usam caminhos relativos.
-- Skills que façam recomendações de acessibilidade incluem pelo menos uma fonte primária adequada. A revisão humana confirma se a fonte é realmente primária, relevante e suficiente.
-- Se uma fonte essencial ou ferramenta necessária não estiver disponível, o skill declara a limitação; não inventa nem substitui silenciosamente a evidência.
-- O validador será implementado em TypeScript e usará apenas uma dependência YAML fixa.
-- O comando `validate-skills` valida todos os núcleos e overlays existentes, produzindo erros claros.
-- A validação cobre metadados, nome coerente, sete secções, estrutura de fontes, formato de URLs e referências locais. Não abre URLs externos nem avalia a qualidade semântica das fontes.
-- Os overlays são opcionais. Quando existirem, incluem instruções manuais num `README.md`.
-- Cada skill terá um `CHECKLIST.md` curto com activação, entrada em falta, caso negativo e resultado esperado. Só é actualizado se mudarem comportamento, entradas ou limites.
-- O GitHub Actions executa o mesmo comando. A verificação falhada deve impedir a integração na branch principal através de uma regra obrigatória.
-- O contrato segue Semantic Versioning: major altera regras obrigatórias, minor acrescenta regras opcionais compatíveis e patch apenas clarifica. Uma alteração major migra todos os skills na mesma alteração.
+- The contract will have version `1.0.0` and will be the source of truth for the portable core.
+- Each portable core uses `SKILL.md` with the base metadata `name` and `description`.
+- All cores include, in this order, the sections `Purpose and boundaries`, `Required inputs`, `Expected outcome`, `Sources`, `Optional tools`, `Limitations and uncertainty` and `Quality criteria`.
+- A section without applicable content explicitly explains why. Additional sections are allowed after the seven required sections.
+- External sources use a direct `https://` URL, the responsible organisation, and a version or access date in `YYYY-MM-DD` format. Internal references use relative paths.
+- Skills that make accessibility recommendations include at least one suitable primary source. Human review confirms whether the source is genuinely primary, relevant and sufficient.
+- If an essential source or required tool is unavailable, the skill declares the limitation; it does not invent or silently replace evidence.
+- The validator will be implemented in TypeScript and will use only one fixed YAML dependency.
+- The `validate-skills` command validates every existing core and overlay and produces clear errors.
+- Validation covers metadata, consistent naming, the seven sections, source structure, URL format and local references. It does not open external URLs or assess the semantic quality of sources.
+- Overlays are optional. When present, they include manual instructions in a `README.md`.
+- Each skill will have a short `CHECKLIST.md` covering activation, missing input, negative case and expected outcome. It is updated only if behaviour, inputs or boundaries change.
+- GitHub Actions runs the same command. A failed check must prevent integration into the main branch through a required rule.
+- The contract follows Semantic Versioning: major changes modify required rules, minor changes add compatible optional rules, and patches only clarify. A major change migrates all skills in the same change.
 
 ## Testing Decisions
 
-- O teste principal é o comportamento observável do comando `validate-skills`, não os detalhes internos da sua implementação.
-- A validação usa exemplos internos válidos e inválidos para cobrir metadados, secções obrigatórias, fontes, URLs, referências locais e overlays.
-- Um exemplo válido confirma que o contrato aceite é processado sem erro.
-- Cada exemplo inválido confirma um erro específico e compreensível.
-- O GitHub Actions executa a mesma validação local, sem uma segunda implementação de regras.
-- A checklist manual é complementar: testa o comportamento futuro de cada skill, mas não substitui a validação estrutural.
-- Não há ainda evals automáticos de activação ou comportamento por ambiente; serão considerados depois de existirem skills e padrões estáveis.
+- The main test is the observable behaviour of the `validate-skills` command, not its implementation details.
+- Validation uses valid and invalid internal examples to cover metadata, required sections, sources, URLs, local references and overlays.
+- A valid example confirms that an accepted contract is processed without error.
+- Each invalid example confirms one specific, understandable error.
+- GitHub Actions runs the same local validation, without a second implementation of the rules.
+- The manual checklist is complementary: it tests each skill's future behaviour, but does not replace structural validation.
+- There are no automated activation or per-environment behaviour evals yet; they will be considered once skills and stable patterns exist.
 
 ## Out of Scope
 
-- Criar ou escolher skills do MVP.
-- Instalar overlays automaticamente.
-- Criar evals automáticos por Claude Code ou Codex.
-- Abrir URLs, verificar disponibilidade de fontes externas ou determinar automaticamente se uma fonte é primária.
-- Declarar conformidade WCAG ou outra conformidade global.
-- Suportar versões de contrato diferentes no mesmo repositório.
+- Creating or selecting MVP skills.
+- Installing overlays automatically.
+- Creating automated evals for Claude Code or Codex.
+- Opening URLs, checking the availability of external sources or automatically determining whether a source is primary.
+- Declaring WCAG conformance or any other overall conformance.
+- Supporting different contract versions in the same repository.
 
 ## Further Notes
 
-A primeira entrega constrói a base de contrato e validação antes de publicar skills utilizáveis. Um skill só estará pronto para publicação quando passar a validação estrutural e a revisão humana de conteúdo.
+The first delivery builds the contract and validation foundation before usable skills are published. A skill is ready for publication only after passing structural validation and human content review.

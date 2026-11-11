@@ -1,55 +1,55 @@
-# Prática de testes de skills
+# Skill testing practice
 
-**Data de consulta:** 10-11-2026  
-**Âmbito:** verificar se `mattpocock/skills` testa ou avalia os seus próprios skills e comparar essa prática com a documentação oficial de Codex e Claude Code. Não recomenda uma solução para este projecto.
+**Access date:** 10-11-2026
+**Scope:** check whether `mattpocock/skills` tests or evaluates its own skills and compare that practice with official Codex and Claude Code documentation. It does not recommend a solution for this project.
 
-## Conclusão curta
+## Short conclusion
 
-O repositório público de Matt Pocock não contém, no estado consultado, uma suite automatizada de testes ou evals para os seus próprios skills. Isto não prova que nunca são testados fora do repositório. A documentação oficial de OpenAI e Claude Code, pelo contrário, recomenda evals de comportamento para detectar regressões, depois de o skill funcionar manualmente.
+The public Matt Pocock repository did not contain an automated test or eval suite for its own skills at the point checked. This does not prove that they are never tested outside the repository. By contrast, official OpenAI and Claude Code documentation recommends behavioural evals to detect regressions after a skill works manually.
 
-Não há evidência suficiente para afirmar que os evals são uma prática comum em todos os repositórios de skills. Há evidência de que são uma prática oficialmente suportada e recomendada nos dois ambientes.
+There is insufficient evidence to say that evals are common practice in every skills repository. There is evidence that they are officially supported and recommended in both environments.
 
-## Factos sobre `mattpocock/skills`
+## Facts about `mattpocock/skills`
 
-### Estrutura e comandos publicados
+### Published structure and commands
 
-Na árvore do repositório em `main`, consultada no commit `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d`, não existem directórios ou ficheiros com nomes de suites de teste ou eval (`test`, `tests`, `eval` ou `evals`). A árvore inclui três workflows GitHub Actions e `skills/engineering/tdd/tests.md`, que é material de instrução para testar código produzido por um agente, não uma suite que teste os skills. [Árvore do repositório](https://api.github.com/repos/mattpocock/skills/git/trees/main?recursive=1) [Guia de bons e maus testes](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/tdd/tests.md)
+In the repository tree on `main`, checked at commit `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d`, there are no directories or files named for test or eval suites (`test`, `tests`, `eval` or `evals`). The tree includes three GitHub Actions workflows and `skills/engineering/tdd/tests.md`, which is instructional material for testing code produced by an agent, not a suite that tests the skills. [Repository tree](https://api.github.com/repos/mattpocock/skills/git/trees/main?recursive=1) [Good and bad tests guide](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/tdd/tests.md)
 
-O `package.json` só declara comandos de versionamento e verificação da versão do plugin. Não declara `test`, `check` ou `eval`. O workflow de release instala dependências e executa o versionamento; não executa testes ou evals. [package.json](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/package.json) [workflow de release](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/.github/workflows/release.yml)
+The `package.json` declares only versioning and plugin-version checking commands. It does not declare `test`, `check` or `eval`. The release workflow installs dependencies and runs versioning; it does not run tests or evals. [package.json](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/package.json) [Release workflow](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/.github/workflows/release.yml)
 
-O documento `writing-for-agents` afirma explicitamente, para esse material, que não existe eval automático e que a verificação é uma execução manual com vocabulário de falhas como diagnóstico. Isto é uma afirmação sobre esse documento, não uma garantia para todos os skills do repositório. [writing-for-agents](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/docs/productivity/writing-for-agents.md)
+The `writing-for-agents` document explicitly states that, for that material, there is no automatic eval and that verification is a manual run using failure vocabulary as a diagnostic. This is a statement about that document, not a guarantee for every skill in the repository. [writing-for-agents](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/docs/productivity/writing-for-agents.md)
 
-### Limitação da conclusão
+### Limitation of the conclusion
 
-A ausência de ficheiros e comandos no repositório não demonstra como Matt Pocock testa localmente, em serviços externos ou antes de publicar. A conclusão confirmada é mais limitada: **o repositório público consultado não distribui uma suite automatizada de testes ou evals para os próprios skills**.
+The absence of files and commands in the repository does not show how Matt Pocock tests locally, in external services or before publishing. The confirmed conclusion is narrower: **the public repository checked does not distribute an automated test or eval suite for its own skills**.
 
-## Recomendações oficiais
+## Official recommendations
 
 ### OpenAI / Codex
 
-A OpenAI recomenda começar por uma execução manual para expor pressupostos e, depois, criar um conjunto pequeno de prompts que cubra invocação explícita, invocação implícita, contexto, controlo negativo e entradas incompletas. Descreve evals como prompt, execução capturada, verificações e pontuação. Também recomenda verificadores determinísticos sobre eventos de `codex exec --json` antes de acrescentar avaliação por modelo. [Testing Agent Skills Systematically with Evals](https://developers.openai.com/blog/eval-skills)
+OpenAI recommends starting with a manual run to expose assumptions and then creating a small set of prompts that covers explicit invocation, implicit invocation, context, negative control and incomplete inputs. It describes evals as a prompt, captured execution, checks and scoring. It also recommends deterministic checkers over `codex exec --json` events before adding model-based evaluation. [Testing Agent Skills Systematically with Evals](https://developers.openai.com/blog/eval-skills)
 
 ### Claude Code
 
-Claude Code disponibiliza `claude plugin eval` para plugins com skills. Cada caso usa um prompt realista e graders que verificam a resposta, o transcript ou ficheiros criados. A documentação indica que os evals servem para medir fiabilidade, detectar regressões e comparar com uma execução sem plugin. Também explica que cada execução usa chamadas reais ao modelo e consome utilização ou orçamento. [Test plugins with evals](https://code.claude.com/docs/en/plugin-evals)
+Claude Code provides `claude plugin eval` for plugins with skills. Each case uses a realistic prompt and graders that check the response, transcript or created files. The documentation says evals measure reliability, detect regressions and compare with a run without the plugin. It also explains that every run uses real model calls and consumes usage or budget. [Test plugins with evals](https://code.claude.com/docs/en/plugin-evals)
 
-## Inferências
+## Inferences
 
-1. **Testes estruturais e evals de comportamento respondem a perguntas diferentes.** Um verificador de `SKILL.md` pode detectar metadados ou títulos em falta. Não demonstra que o ambiente descobre, invoca e segue o skill.
-2. **Começar só com validação estrutural é uma escolha de fase, não uma regra dos ambientes.** Os dois fornecedores têm documentação para evals comportamentais, mas esses evals requerem prompts, execução do modelo e, no caso de Claude, um plugin e custos de execução.
-3. **Não é correcto usar Matt Pocock como prova contra evals.** O repositório mostra uma prática de verificação manual para pelo menos um documento e não distribui evals automatizados; isso não invalida as ferramentas oficiais nem demonstra prevalência no ecossistema.
+1. **Structural tests and behavioural evals answer different questions.** A `SKILL.md` checker can detect missing metadata or headings. It does not demonstrate that the environment discovers, invokes and follows the skill.
+2. **Starting with structural validation only is a phase choice, not an environment rule.** Both providers document behavioural evals, but those evals require prompts, model execution and, for Claude, a plugin and execution costs.
+3. **Matt Pocock should not be used as evidence against evals.** The repository shows a manual verification practice for at least one document and does not distribute automated evals; this neither invalidates the official tools nor demonstrates their prevalence in the ecosystem.
 
-## Questões em aberto
+## Open questions
 
-1. O projecto deve exigir uma execução manual de comportamento antes da primeira publicação de cada skill?
-2. Em que momento o custo e a complexidade justificam evals automatizados por ambiente?
-3. O futuro validador estrutural deve correr em CI antes de existirem evals de comportamento?
+1. Should the project require a manual behavioural run before the first publication of each skill?
+2. At what point do cost and complexity justify automated per-environment evals?
+3. Should the future structural validator run in CI before behavioural evals exist?
 
-## Fontes primárias consultadas
+## Primary sources consulted
 
-- [Matt Pocock — árvore do repositório](https://api.github.com/repos/mattpocock/skills/git/trees/main?recursive=1)
+- [Matt Pocock — repository tree](https://api.github.com/repos/mattpocock/skills/git/trees/main?recursive=1)
 - [Matt Pocock — package.json](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/package.json)
-- [Matt Pocock — workflow de release](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/.github/workflows/release.yml)
+- [Matt Pocock — release workflow](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/.github/workflows/release.yml)
 - [Matt Pocock — writing-for-agents](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/docs/productivity/writing-for-agents.md)
 - [OpenAI — Testing Agent Skills Systematically with Evals](https://developers.openai.com/blog/eval-skills)
 - [Claude Code — Test plugins with evals](https://code.claude.com/docs/en/plugin-evals)

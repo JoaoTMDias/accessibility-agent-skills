@@ -1,121 +1,122 @@
-# Contrato portátil de skill
+# Portable skill contract
 
-**Ticket:** Contrato portátil de skill  
-**Data de consulta:** 10-11-2026  
-**Âmbito:** interoperabilidade de skills de acessibilidade entre Claude Code e Codex. Não selecciona skills do MVP nem define implementações.
+**Ticket:** Portable skill contract
 
-## Conclusão
+**Access date:** 10-11-2026
+**Scope:** interoperability of accessibility skills between Claude Code and Codex. It does not select MVP skills or define implementations.
 
-O contrato comum deve ser um directório cujo nome coincide com o `name`, contendo um `SKILL.md` UTF-8. O ficheiro começa com frontmatter YAML com apenas `name` e `description` obrigatórios; o corpo Markdown usa sete secções estáveis: **Objectivo e limites**, **Entradas necessárias**, **Resultado esperado**, **Fontes**, **Ferramentas opcionais**, **Limitações e incerteza** e **Critérios de qualidade**. `license`, `compatibility` e `metadata` podem ser usados quando forem necessários, mas não devem transportar a semântica essencial do workflow. Ferramentas devem ser declaradas no corpo como capacidade opcional, nunca como uma permissão portátil.
+## Conclusion
 
-Isto preserva a parte que ambos os produtos documentam (directório, `SKILL.md`, `name`, `description`, instruções e recursos opcionais) e evita campos que uma das plataformas trata como extensão ou cujo comportamento no Codex não está documentado.
+The common contract should be a directory whose name matches `name`, containing a UTF-8 `SKILL.md`. The file starts with YAML frontmatter with only `name` and `description` required; the Markdown body uses seven stable sections: **Purpose and boundaries**, **Required inputs**, **Expected outcome**, **Sources**, **Optional tools**, **Limitations and uncertainty** and **Quality criteria**. `license`, `compatibility` and `metadata` may be used when needed, but must not carry essential workflow semantics. Tools must be declared in the body as optional capability, never as a portable permission.
 
-## Factos confirmados
+This preserves the part both products document (directory, `SKILL.md`, `name`, `description`, instructions and optional resources) and avoids fields that either platform treats as an extension or whose Codex behaviour is undocumented.
+
+## Confirmed facts
 
 ### 1. Agent Skills specification
 
-A specification define um skill como um directório com, no mínimo, `SKILL.md`; `scripts/`, `references/` e `assets/` são convenções opcionais. O `SKILL.md` tem frontmatter YAML seguido de Markdown. [Specification — estrutura e frontmatter](https://agentskills.io/specification)
+The specification defines a skill as a directory containing, at a minimum, `SKILL.md`; `scripts/`, `references/` and `assets/` are optional conventions. `SKILL.md` has YAML frontmatter followed by Markdown. [Specification — structure and frontmatter](https://agentskills.io/specification)
 
-| Campo de frontmatter | Estado na specification | Regra confirmada |
+| Frontmatter field | Status in the specification | Confirmed rule |
 | --- | --- | --- |
-| `name` | obrigatório | 1–64 caracteres; minúsculas, algarismos e hífen; não começa/termina em hífen, não inclui `--` e coincide com o directório-pai. |
-| `description` | obrigatório | 1–1024 caracteres, não vazio; explica o que faz e quando usar. |
-| `license` | opcional | licença ou referência a ficheiro de licença. |
-| `compatibility` | opcional | até 500 caracteres; requisitos de ambiente. |
-| `metadata` | opcional | mapa string→string para propriedades adicionais. |
-| `allowed-tools` | opcional e experimental | string de ferramentas pré-aprovadas; o suporte varia entre implementações. |
+| `name` | required | 1–64 characters; lowercase letters, digits and hyphens; does not start or end with a hyphen, does not include `--`, and matches the parent directory. |
+| `description` | required | 1–1024 characters, non-empty; explains what it does and when to use it. |
+| `license` | optional | Licence or reference to a licence file. |
+| `compatibility` | optional | Up to 500 characters; environment requirements. |
+| `metadata` | optional | String-to-string map for additional properties. |
+| `allowed-tools` | optional and experimental | String of pre-approved tools; support varies between implementations. |
 
-O corpo não tem estrutura obrigatória. A specification recomenda passos, exemplos de entrada/saída e casos limite. Também recomenda instruções com menos de 5 000 tokens, `SKILL.md` com menos de 500 linhas, e recursos carregados sob pedido; referências devem usar caminhos relativos e pouco profundos. [Specification — conteúdo, disclosure progressivo e referências](https://agentskills.io/specification)
+The body has no required structure. The specification recommends steps, input/output examples and edge cases. It also recommends instructions under 5,000 tokens, `SKILL.md` under 500 lines, and resources loaded on demand; references should use shallow relative paths. [Specification — content, progressive disclosure and references](https://agentskills.io/specification)
 
-### 2. Suporte documentado em Claude Code
+### 2. Documented Claude Code support
 
-Claude Code afirma seguir a Agent Skills specification e documenta que aceita os seis campos da specification. Para distribuição fora do Claude Code (upload claude.ai, Skills API e `package_skill.py`), só esses seis campos são aceites; campos extra falham a validação. [Claude Code — compatibilidade de frontmatter](https://code.claude.com/docs/en/skills#using-skill-frontmatter-outside-claude-code)
+Claude Code says it follows the Agent Skills specification and documents acceptance of the six specification fields. For distribution outside Claude Code (claude.ai upload, Skills API and `package_skill.py`), only those six fields are accepted; extra fields fail validation. [Claude Code — frontmatter compatibility](https://code.claude.com/docs/en/skills#using-skill-frontmatter-outside-claude-code)
 
-No Claude Code local, `SKILL.md` pode ter campos adicionais, incluindo `when_to_use`, `argument-hint`, `arguments`, `disable-model-invocation`, `user-invocable`, `disallowed-tools`, `context`, `agent`, `model`, `paths`, `hooks` e `shell`. Claude documenta, por exemplo, que `allowed-tools` concede pré-aprovação apenas durante o turno que invoca o skill. [Claude Code — referência de frontmatter](https://code.claude.com/docs/en/skills#frontmatter-reference) [Claude Code — pré-aprovação de ferramentas](https://code.claude.com/docs/en/skills#pre-approve-tools-for-a-skill)
+In local Claude Code, `SKILL.md` can contain additional fields including `when_to_use`, `argument-hint`, `arguments`, `disable-model-invocation`, `user-invocable`, `disallowed-tools`, `context`, `agent`, `model`, `paths`, `hooks` and `shell`. Claude documents, for example, that `allowed-tools` grants pre-approval only during the turn that invokes the skill. [Claude Code — frontmatter reference](https://code.claude.com/docs/en/skills#frontmatter-reference) [Claude Code — tool pre-approval](https://code.claude.com/docs/en/skills#pre-approve-tools-for-a-skill)
 
-O carregamento local de projecto usa `.claude/skills/<nome>/SKILL.md`; também existem âmbitos pessoal, empresarial, plugins, directórios adicionados e comandos legados. [Claude Code — localização e resolução de nomes](https://code.claude.com/docs/en/skills#how-a-skill-gets-its-command-name)
+Local project loading in Claude Code uses `.claude/skills/<name>/SKILL.md`; there are also personal, enterprise, plugin, added-directory and legacy-command scopes. [Claude Code — location and name resolution](https://code.claude.com/docs/en/skills#how-a-skill-gets-its-command-name)
 
-### 3. Suporte documentado em Codex
+### 3. Documented Codex support
 
-O Codex documenta um skill como directório com `SKILL.md`, `name`, `description`, instruções e `scripts/`, `references/` ou `assets/` opcionais. Codex e ChatGPT usam o `name` e a `description` para descoberta e carregam o corpo quando seleccionam o skill. [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills)
+Codex documents a skill as a directory containing `SKILL.md`, `name`, `description`, instructions and optional `scripts/`, `references/` or `assets/`. Codex and ChatGPT use `name` and `description` for discovery and load the body when they select the skill. [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills)
 
-Para skills locais, Codex varre `.agents/skills` desde o directório de trabalho até à raiz do repositório, e também tem âmbitos de utilizador, administrador e sistema. [OpenAI — localizações Codex](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)
+For local skills, Codex scans `.agents/skills` from the working directory to the repository root, and also has user, administrator and system scopes. [OpenAI — Codex locations](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)
 
-No Codex, `agents/openai.yaml` é opcional e serve para apresentação na aplicação, política de invocação implícita e dependências de ferramentas. A declaração de dependência MCP é feita nesse ficheiro, não no `SKILL.md`. [OpenAI — metadados opcionais](https://learn.chatgpt.com/docs/build-skills#optional-metadata) [OpenAI — dependências MCP](https://developers.openai.com/plugins/build/skills)
+In Codex, `agents/openai.yaml` is optional and is used for application presentation, implicit-invocation policy and tool dependencies. MCP dependencies are declared in that file, not in `SKILL.md`. [OpenAI — optional metadata](https://learn.chatgpt.com/docs/build-skills#optional-metadata) [OpenAI — MCP dependencies](https://developers.openai.com/plugins/build/skills)
 
-### 4. Diferenças relevantes
+### 4. Relevant differences
 
-| Tema | Claude Code | Codex | Impacto no contrato comum |
+| Topic | Claude Code | Codex | Impact on the common contract |
 | --- | --- | --- | --- |
-| Caminho local | `.claude/skills/` | `.agents/skills/` | A instalação fica fora do conteúdo portátil. |
-| Descoberta | descrição; pode acrescentar `when_to_use` | `name`, descrição e caminho; pode truncar descrições por limite de contexto | A `description` deve conter objectivo, gatilhos e exclusões logo no início. |
-| Controlo de invocação | campos no frontmatter | `agents/openai.yaml` | Não declarar política de invocação no contrato comum. |
-| Ferramentas | `allowed-tools` tem semântica de pré-aprovação por turno | `agents/openai.yaml` declara dependências; a documentação consultada não atribui semântica de permissões a `allowed-tools` | Não usar `allowed-tools` para requisitos ou autorização comuns. |
-| Contexto dinâmico/subagente | extensões como `!` para shell, placeholders `CLAUDE_*` e `context: fork` | metadados e integração próprios | Excluir do corpo e frontmatter portátil. |
+| Local path | `.claude/skills/` | `.agents/skills/` | Installation remains outside portable content. |
+| Discovery | Description; can add `when_to_use` | `name`, description and path; descriptions may be truncated by the context limit | The `description` should contain purpose, triggers and exclusions at the start. |
+| Invocation control | Frontmatter fields | `agents/openai.yaml` | Do not declare invocation policy in the common contract. |
+| Tools | `allowed-tools` has turn-scoped pre-approval semantics | `agents/openai.yaml` declares dependencies; the documentation checked does not assign permission semantics to `allowed-tools` | Do not use `allowed-tools` for common requirements or authorisation. |
+| Dynamic context/subagent | Extensions such as `!` for shell, `CLAUDE_*` placeholders and `context: fork` | Own metadata and integration | Exclude from portable body and frontmatter. |
 
-### 5. Limite do que é comprovado sobre os campos standard no Codex
+### 5. Boundary of what is evidenced about standard fields in Codex
 
-O Codex diz que os skills assentam na open Agent Skills standard, mas a página de criação local consultada só exige expressamente `name` e `description`; não enumera o comportamento de `license`, `compatibility`, `metadata` nem `allowed-tools` no `SKILL.md`. Assim, é comprovado que esses quatro campos pertencem à specification, mas não que cada um produza comportamento no Codex local. Esta distinção é importante para não depender deles no MVP. [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills) [Specification — campos](https://agentskills.io/specification)
+Codex says skills are based on the open Agent Skills standard, but the local-creation page checked explicitly requires only `name` and `description`; it does not list behaviour for `license`, `compatibility`, `metadata` or `allowed-tools` in `SKILL.md`. It is therefore evidenced that these four fields belong to the specification, but not that each produces behaviour in local Codex. This distinction matters so that the MVP does not depend on them. [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills) [Specification — fields](https://agentskills.io/specification)
 
-## Inferências de desenho
+## Design inferences
 
-Estas decisões não são exigências formais da specification; são convenções propostas para este projecto.
+These decisions are not formal requirements of the specification; they are proposed conventions for this project.
 
-1. **Usar só `name` e `description` como campos nucleares.** São os únicos dois requeridos pela specification e os únicos explicitamente exigidos pela documentação Codex consultada. Isto reduz pontos de falha e mantém a descoberta portátil.
-2. **Tornar as sete secções de Markdown obrigatórias no projecto.** A specification deixa o corpo livre, mas OpenAI exige que um workflow deixe claros entrada, passos, saída, factos que não pode inferir, quando perguntar/parar e ficheiros de suporte. As secções traduzem esses requisitos num formato verificável. [OpenAI — definição do limite do workflow](https://developers.openai.com/plugins/build/skills)
-3. **Descrever ferramentas, não as autorizar.** Um bloco “Ferramentas opcionais” pode dizer finalidade, pré-condições e alternativa manual. Não concede permissões e sobrevive às diferenças de configuração.
-4. **Usar links relativos para material incluído e URLs directos para normas externas.** É compatível com a recommendation da specification e torna a proveniência auditável.
+1. **Use only `name` and `description` as core fields.** They are the only two required by the specification and the only two explicitly required by the Codex documentation checked. This reduces failure points and keeps discovery portable.
+2. **Make the seven Markdown sections mandatory in the project.** The specification leaves the body free, but OpenAI requires a workflow to make clear its input, steps, output, facts it cannot infer, when to ask or stop, and supporting files. The sections translate those requirements into a verifiable format. [OpenAI — defining workflow boundaries](https://developers.openai.com/plugins/build/skills)
+3. **Describe tools; do not authorise them.** An “Optional tools” section can state purpose, preconditions and a manual alternative. It grants no permissions and survives configuration differences.
+4. **Use relative links for included material and direct URLs for external standards.** This is compatible with the specification recommendation and makes provenance auditable.
 
-## Contrato portátil recomendado
+## Recommended portable contract
 
-### Estrutura mínima
+### Minimum structure
 
-| Elemento | Regra do projecto | Justificação curta |
+| Element | Project rule | Brief rationale |
 | --- | --- | --- |
-| `<nome>/SKILL.md` | obrigatório; `<nome>` igual a `name` | cumpre a specification. |
-| Frontmatter | obrigatório; `name` e `description` apenas como base | superfície comum comprovada. |
-| `references/` | opcional; fontes extensas ou normas por ficheiro | mantém `SKILL.md` curto e permite carregamento sob pedido. |
-| `scripts/` e `assets/` | opcionais | só quando houver necessidade determinística ou recurso reutilizável. |
+| `<name>/SKILL.md` | required; `<name>` equals `name` | complies with the specification. |
+| Frontmatter | required; `name` and `description` only as the base | proven common surface. |
+| `references/` | optional; lengthy sources or standards per file | keeps `SKILL.md` short and enables on-demand loading. |
+| `scripts/` and `assets/` | optional | only when there is a deterministic need or reusable resource. |
 
-### Semântica mínima de cada `SKILL.md`
+### Minimum semantics of each `SKILL.md`
 
-| Secção | Conteúdo obrigatório | Regra de qualidade |
+| Section | Required content | Quality rule |
 | --- | --- | --- |
-| `## Objectivo e limites` | problema que resolve, quando usar e não usar | não prometer validação/conformidade não executada. |
-| `## Entradas necessárias` | dados, formato, contexto e o que fazer se faltarem | separar obrigatório de opcional; não inferir factos críticos. |
-| `## Resultado esperado` | entregável, formato, detalhe e evidência a devolver | declaradamente verificável pelo utilizador. |
-| `## Fontes` | fontes a consultar, hierarquia de autoridade e forma de citar | preferir norma/fornecedor/implementação oficial; distinguir factos de inferências. |
-| `## Ferramentas opcionais` | ferramenta, finalidade, condição de disponibilidade e alternativa | nunca assumir credenciais, rede ou permissões. |
-| `## Limitações e incerteza` | fronteiras do método, cobertura não garantida e quando escalar/perguntar | dizer “necessita de verificação” quando aplicável. |
-| `## Critérios de qualidade` | lista de verificação do resultado, incluindo acessibilidade aplicável | critérios observáveis, não adjectivos vagos como “boa qualidade”. |
+| `## Purpose and boundaries` | problem it solves, when to use and not use it | do not promise unperformed validation or conformance. |
+| `## Required inputs` | data, format, context and what to do when they are missing | separate required from optional; do not infer critical facts. |
+| `## Expected outcome` | deliverable, format, detail and evidence to return | explicitly verifiable by the user. |
+| `## Sources` | sources to consult, authority hierarchy and citation approach | prefer standards, vendors or official implementation; distinguish facts from inferences. |
+| `## Optional tools` | tool, purpose, availability condition and alternative | never assume credentials, network access or permission. |
+| `## Limitations and uncertainty` | method boundaries, coverage not guaranteed and when to escalate or ask | say “needs verification” where applicable. |
+| `## Quality criteria` | result checklist, including applicable accessibility | observable criteria, not vague adjectives such as “good quality”. |
 
-`description` deve ser concisa e conter, nesta ordem, o objectivo, os gatilhos e a exclusão principal. É a informação que ambos os ambientes usam antes de lerem as instruções completas. [Specification — disclosure progressivo](https://agentskills.io/specification) [OpenAI — activação](https://learn.chatgpt.com/docs/build-skills#how-chatgpt-and-codex-use-skills)
+`description` should be concise and contain, in this order, purpose, triggers and the main exclusion. It is the information both environments use before reading the complete instructions. [Specification — progressive disclosure](https://agentskills.io/specification) [OpenAI — activation](https://learn.chatgpt.com/docs/build-skills#how-chatgpt-and-codex-use-skills)
 
-### Campos opcionais permitidos, mas não necessários
+### Permitted but unnecessary optional fields
 
-- `license`: quando a distribuição o exige.
-- `compatibility`: apenas para uma dependência real de ambiente; não para declarar preferência por um agente.
-- `metadata`: apenas pares string→string não essenciais (por exemplo, versão editorial). A execução não pode depender dele.
-- `allowed-tools`: não faz parte do contrato recomendado. Pode existir numa variante específica de Claude Code, após revisão de segurança, mas é experimental na specification e o seu suporte varia.
+- `license`: when distribution requires it.
+- `compatibility`: only for a real environment dependency; not to declare a preference for an agent.
+- `metadata`: only non-essential string-to-string pairs (for example, editorial version). Execution must not depend on it.
+- `allowed-tools`: not part of the recommended contract. It may exist in a Claude Code-specific variant after security review, but it is experimental in the specification and support varies.
 
-## Fora do contrato comum
+## Outside the common contract
 
-Manter em overlays de distribuição/configuração por ambiente, nunca no `SKILL.md` portátil:
+Keep these in per-environment distribution or configuration overlays, never in portable `SKILL.md`:
 
-- **Claude Code:** `.claude/skills`, campos de invocação e argumentos, `context`, `agent`, `model`, `paths`, `shell`, `hooks`, `disallowed-tools`, o mecanismo de permissões de `allowed-tools`, comandos `!` e variáveis `${CLAUDE_*}`.
-- **Codex:** `.agents/skills`, `agents/openai.yaml` (interface, `policy.allow_implicit_invocation` e `dependencies.tools`), `~/.codex/config.toml`, manifestos/overlays de plugin e hooks de Codex/ChatGPT.
-- **Ambos:** nomes concretos de conectores, credenciais, caminhos absolutos, decisões de autorização, versões de runtime, UI e automações. Podem ser pré-requisitos documentados, mas não condições silenciosas do workflow.
+- **Claude Code:** `.claude/skills`, invocation and argument fields, `context`, `agent`, `model`, `paths`, `shell`, `hooks`, `disallowed-tools`, the `allowed-tools` permission mechanism, `!` commands and `${CLAUDE_*}` variables.
+- **Codex:** `.agents/skills`, `agents/openai.yaml` (interface, `policy.allow_implicit_invocation` and `dependencies.tools`), `~/.codex/config.toml`, plugin manifests or overlays, and Codex/ChatGPT hooks.
+- **Both:** concrete connector names, credentials, absolute paths, authorisation decisions, runtime versions, UI and automations. They may be documented prerequisites, but not silent workflow conditions.
 
-## Questões em aberto
+## Open questions
 
-1. **Validação no Codex local dos quatro campos opcionais standard:** a documentação consultada não confirma se são preservados, ignorados ou usados. Deve ser testado numa instalação limpa antes de passar de “metadata opcional” a dependência operacional.
-2. **Nome e formato do mecanismo de overlay deste projecto:** ainda não foi definida uma estratégia de distribuição (pastas paralelas, geração no build, ou plugins). Não é necessário resolvê-la para escrever skills portáteis.
-3. **Critérios de qualidade por domínio:** o contrato define que cada skill os deve ter; a grelha concreta (por exemplo WCAG, WAI-ARIA, testes assistivos) deve ser definida por tipo de skill, não inventada aqui.
+1. **Validation in local Codex of the four optional standard fields:** the documentation checked does not confirm whether they are preserved, ignored or used. This should be tested in a clean installation before moving from “optional metadata” to an operational dependency.
+2. **Name and format of this project's overlay mechanism:** a distribution strategy has not yet been chosen (parallel folders, build generation or plugins). It does not need to be settled to write portable skills.
+3. **Domain-specific quality criteria:** the contract specifies that every skill must have them; the concrete framework (for example WCAG, WAI-ARIA or assistive-technology testing) should be defined by skill type, not invented here.
 
-## Fontes primárias consultadas
+## Primary sources consulted
 
-- [Agent Skills — Specification](https://agentskills.io/specification) — consultada em 10-11-2026.
-- [Claude Code — Skills](https://code.claude.com/docs/en/skills) — consultada em 10-11-2026.
-- [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills) — consultada em 10-11-2026.
-- [OpenAI Developers — Build skills for plugins](https://developers.openai.com/plugins/build/skills) — consultada em 10-11-2026.
-- [OpenAI API — Skills](https://developers.openai.com/api/docs/guides/tools-skills) — consultada em 10-11-2026.
+- [Agent Skills — Specification](https://agentskills.io/specification) — accessed on 10-11-2026.
+- [Claude Code — Skills](https://code.claude.com/docs/en/skills) — accessed on 10-11-2026.
+- [OpenAI — Build skills](https://learn.chatgpt.com/docs/build-skills) — accessed on 10-11-2026.
+- [OpenAI Developers — Build skills for plugins](https://developers.openai.com/plugins/build/skills) — accessed on 10-11-2026.
+- [OpenAI API — Skills](https://developers.openai.com/api/docs/guides/tools-skills) — accessed on 10-11-2026.
